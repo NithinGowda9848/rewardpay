@@ -1,5 +1,5 @@
-import React, { useState, useContext } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useContext, useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import authService from '../../services/authService';
 import { FaUser, FaMobileAlt, FaLock, FaEye, FaEyeSlash, FaCheckCircle, FaGift, FaEnvelope } from 'react-icons/fa';
@@ -19,6 +19,14 @@ const Register = () => {
   
   const { register } = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      setFormData(prev => ({ ...prev, referralCode: ref }));
+    }
+  }, [searchParams]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
