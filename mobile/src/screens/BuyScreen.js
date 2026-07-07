@@ -16,7 +16,7 @@ import GlassCard from '../components/GlassCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
 import SuccessModal from '../components/SuccessModal';
 import DashboardHeader from '../components/DashboardHeader';
-import { BACKEND_IP } from '../config';
+import { BACKEND_URL } from '../config';
 
 export default function BuyScreen({ navigation }) {
   const { user, refreshUser } = useAuth();
@@ -213,7 +213,7 @@ export default function BuyScreen({ navigation }) {
                   <GlassCard key={pkg._id} style={styles.packageCard}>
                   <View style={styles.cardHeader}>
                     <Image
-                      source={{ uri: `http://${BACKEND_IP}:5000${pkg.image || '/images/solar_farm.png'}` }}
+                      source={{ uri: `${BACKEND_URL}${pkg.image || '/images/solar_farm.png'}` }}
                       style={styles.packageImage}
                       resizeMode="cover"
                     />
@@ -284,7 +284,7 @@ export default function BuyScreen({ navigation }) {
                 <GlassCard key={inv._id} style={styles.activeCard}>
                   <View style={styles.activeHeader}>
                     <Image
-                      source={{ uri: `http://${BACKEND_IP}:5000${inv.packageId?.image || '/images/solar_farm.png'}` }}
+                      source={{ uri: `${BACKEND_URL}${inv.packageId?.image || '/images/solar_farm.png'}` }}
                       style={styles.activePackageImage}
                       resizeMode="cover"
                     />

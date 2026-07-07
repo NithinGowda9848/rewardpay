@@ -43,7 +43,7 @@ export const AuthProvider = ({ children }) => {
       if (!parsedUser || !parsedUser.token) return user;
 
       // Re-fetch user profile from the backend
-      const res = await fetch('http://localhost:5000/api/auth/me', {
+      const res = await fetch('https://s-reward-pay.onrender.com/api/auth/me', {
         headers: { 'Authorization': 'Bearer ' + parsedUser.token }
       });
       const data = await res.json();
