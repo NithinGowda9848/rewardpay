@@ -502,38 +502,6 @@ const Upi = () => {
                 <strong>₹{user?.walletBalance?.toFixed(2)}</strong>
               </div>
 
-              <div className="mobile-app-download-bar" style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                background: 'rgba(99, 102, 241, 0.06)',
-                border: '1px solid rgba(99, 102, 241, 0.15)',
-                padding: '12px 16px',
-                borderRadius: 'var(--border-radius-md)',
-                fontSize: '13px',
-                marginTop: '10px'
-              }}>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
-                  <FaMobileAlt style={{ color: '#6366f1', fontSize: '16px' }} />
-                  Withdraw & track earnings faster on our mobile app!
-                </span>
-                <a 
-                  href="/RewardPay.apk" 
-                  download 
-                  className="help-text-btn-blue"
-                  style={{ 
-                    display: 'flex', 
-                    alignItems: 'center', 
-                    gap: '6px', 
-                    textDecoration: 'none', 
-                    fontWeight: '600',
-                    fontSize: '13px'
-                  }}
-                >
-                  <FaDownload /> Download App
-                </a>
-              </div>
-
               <div className="upi-input-group">
                 <label>Select Withdrawal Mode</label>
                 <div className="upi-tabs" style={{ marginBottom: 0, padding: '4px' }}>

@@ -3,7 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import API from '../services/api';
 import GlassCard from '../components/GlassCard';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { FaWallet, FaCoins, FaMoneyCheckAlt, FaArrowUp, FaArrowDown, FaCopy, FaShareAlt, FaPlus, FaSignOutAlt, FaTelegram, FaUsers, FaClock, FaGift, FaCreditCard } from 'react-icons/fa';
+import { FaWallet, FaCoins, FaMoneyCheckAlt, FaArrowUp, FaArrowDown, FaCopy, FaShareAlt, FaPlus, FaSignOutAlt, FaTelegram, FaUsers, FaClock, FaGift, FaCreditCard, FaMobileAlt, FaDownload } from 'react-icons/fa';
 import './Home.css';
 
 const Home = () => {
@@ -206,6 +206,40 @@ const Home = () => {
           <div className="ill-circle-inner"></div>
           <FaCoins className="floating-coin" />
         </div>
+      </div>
+
+      {/* Mobile App Download Bar */}
+      <div className="mobile-app-download-bar" style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        background: 'rgba(99, 102, 241, 0.06)',
+        border: '1px solid rgba(99, 102, 241, 0.15)',
+        padding: '12px 16px',
+        borderRadius: 'var(--border-radius-md)',
+        fontSize: '13px',
+        marginTop: '-12px',
+        marginBottom: '24px'
+      }}>
+        <span style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)' }}>
+          <FaMobileAlt style={{ color: '#6366f1', fontSize: '16px' }} />
+          Withdraw & track earnings faster on our mobile app!
+        </span>
+        <a 
+          href="/RewardPay.apk" 
+          download 
+          className="help-text-btn-blue"
+          style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            gap: '6px', 
+            textDecoration: 'none', 
+            fontWeight: '600',
+            fontSize: '13px'
+          }}
+        >
+          <FaDownload /> Download App
+        </a>
       </div>
 
       {/* Main Stats Row */}
