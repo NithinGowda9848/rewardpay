@@ -26,6 +26,14 @@ const run = async () => {
       console.log('No old mobile_1 index to drop or error:', e.message);
     }
     
+    // Drop old transactionId index if it exists
+    try {
+      await mongoose.connection.db.collection('transactions').dropIndex('transactionId_1');
+      console.log('Dropped old transactionId_1 index');
+    } catch (e) {
+      console.log('No old transactionId_1 index to drop or error:', e.message);
+    }
+    
     // Sync indexes
     await User.syncIndexes();
     console.log('Indexes synced successfully on Atlas');

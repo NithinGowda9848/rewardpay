@@ -20,6 +20,14 @@ const connectDB = async () => {
     } catch (indexErr) {
       console.log('mobile_1 index did not exist or could not be dropped, which is fine.');
     }
+
+    // Drop old transactionId_1 index on transactions collection to prevent duplicate key errors
+    try {
+      await mongoose.connection.db.collection('transactions').dropIndex('transactionId_1');
+      console.log('Successfully dropped old transactionId_1 index.');
+    } catch (indexErr) {
+      console.log('transactionId_1 index did not exist or could not be dropped, which is fine.');
+    }
   } catch (error) {
     console.error(`MongoDB Connection Error: ${error.message}`);
     process.exit(1);
