@@ -471,7 +471,7 @@ const Buy = () => {
                   {/* Left Column: Image */}
                   <div className="prod-card-image-wrapper">
                     <img
-                      src={pkg.image ? `${getBackendHost()}${pkg.image}` : '/images/solar_farm.png'}
+                      src={pkg.image ? pkg.image : '/images/solar_farm.png'}
                       alt={pkg.name}
                       className="prod-card-image"
                     />
@@ -548,7 +548,7 @@ const Buy = () => {
                 <GlassCard key={inv._id} className="investment-item">
                   <div className="inv-left">
                     <img
-                      src={inv.packageId?.image ? `${getBackendHost()}${inv.packageId.image}` : '/images/solar_farm.png'}
+                      src={inv.packageId?.image ? inv.packageId.image : '/images/solar_farm.png'}
                       alt={inv.name}
                       className="inv-pkg-image"
                     />

@@ -39,8 +39,8 @@ app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
-// Serve static plan images from the frontend public folder
-app.use('/images', express.static(path.join(__dirname, '../frontend/public/images')));
+// Serve static plan images locally from backend directory
+app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
 // Routes
 app.use('/api/auth', authRoutes);
