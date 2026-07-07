@@ -1,0 +1,286 @@
+/* Support Page Styling */
+
+.support-header {
+  margin-bottom: 32px;
+  text-align: left;
+}
+
+.support-header h1 {
+  font-size: 32px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.support-header p {
+  color: var(--text-secondary);
+  font-size: 16px;
+}
+
+/* Grid Layout */
+.support-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  margin-bottom: 40px;
+}
+
+@media (min-width: 992px) {
+  .support-grid {
+    grid-template-columns: 2fr 1fr;
+  }
+}
+
+/* Helpline Channels */
+.support-channels-section h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #ffffff;
+}
+
+.channels-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.channel-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  padding: 24px;
+}
+
+.channel-icon-wrapper {
+  font-size: 28px;
+  width: 56px;
+  height: 56px;
+  border-radius: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.telegram-color {
+  background: rgba(42, 171, 238, 0.15);
+  color: #2aabee;
+  border: 1px solid rgba(42, 171, 238, 0.25);
+}
+
+.whatsapp-color {
+  background: rgba(37, 211, 102, 0.15);
+  color: #25d366;
+  border: 1px solid rgba(37, 211, 102, 0.25);
+}
+
+.email-color {
+  background: rgba(239, 68, 68, 0.15);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.channel-info {
+  flex-grow: 1;
+}
+
+.channel-info h3 {
+  font-size: 18px;
+  margin-bottom: 6px;
+  color: #ffffff;
+}
+
+.channel-info p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}
+
+.channel-link-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 20px;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  transition: var(--transition-smooth);
+  cursor: pointer;
+  border: none;
+}
+
+.tg-btn {
+  background: #2aabee;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(42, 171, 238, 0.3);
+}
+
+.tg-btn:hover {
+  background: #3cb5f0;
+  box-shadow: 0 6px 20px rgba(42, 171, 238, 0.5);
+  transform: translateY(-2px);
+}
+
+.wa-btn {
+  background: #25d366;
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(37, 211, 102, 0.3);
+}
+
+.wa-btn:hover {
+  background: #34e77b;
+  box-shadow: 0 6px 20px rgba(37, 211, 102, 0.5);
+  transform: translateY(-2px);
+}
+
+.mail-btn {
+  background: rgba(255, 255, 255, 0.08);
+  color: #ffffff;
+  border: 1px solid var(--border-glass-bright);
+}
+
+.mail-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-2px);
+}
+
+/* Sidebar Styling */
+.support-info-sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-sidebar-card {
+  padding: 24px;
+}
+
+.sidebar-info-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+.accent-icon {
+  font-size: 20px;
+  color: var(--color-accent-light);
+}
+
+.accent-icon.rose-text {
+  color: var(--color-rose);
+}
+
+.working-hours-text, .security-text {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 16px;
+}
+
+.time-badge {
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+  padding: 12px 16px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 16px;
+}
+
+.time-badge span {
+  font-size: 12px;
+  color: var(--color-accent-light);
+  text-transform: uppercase;
+  font-weight: 600;
+}
+
+.time-badge strong {
+  font-size: 16px;
+  color: #ffffff;
+}
+
+.notif-warning-text {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.warning-card {
+  border-color: rgba(244, 63, 94, 0.2);
+}
+
+.warning-card:hover {
+  border-color: rgba(244, 63, 94, 0.35);
+}
+
+/* FAQs Section */
+.faqs-container-section {
+  margin-top: 40px;
+}
+
+.faqs-container-section h2 {
+  font-size: 20px;
+  margin-bottom: 20px;
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.faq-item {
+  padding: 20px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.faq-question-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+
+.faq-question-row h4 {
+  font-size: 15px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.faq-question-row svg {
+  color: var(--text-secondary);
+  font-size: 14px;
+  flex-shrink: 0;
+  transition: var(--transition-smooth);
+}
+
+.faq-item.open {
+  border-color: var(--border-glass-bright);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.faq-answer-row {
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.faq-answer-row p {
+  color: var(--text-secondary);
+  font-size: 14px;
+  line-height: 1.6;
+}

@@ -1,0 +1,369 @@
+/* Team Page CSS */
+
+.team-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.team-header-row h3 {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.updated-tag {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.margin-top-lg {
+  margin-top: 32px;
+}
+
+/* Blue Wave Commission Card */
+.commission-blue-card {
+  position: relative;
+  background: linear-gradient(135deg, #1d4ed8 0%, #3b82f6 50%, #60a5fa 100%);
+  border-radius: 24px;
+  padding: 24px;
+  overflow: hidden;
+  box-shadow: 0 15px 30px rgba(29, 78, 216, 0.3);
+  margin-bottom: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.blue-card-bg-wave {
+  position: absolute;
+  right: -5%;
+  bottom: -20%;
+  width: 200px;
+  height: 200px;
+  border-radius: 40% 60% 70% 30% / 40% 50% 60% 50%;
+  background: rgba(255, 255, 255, 0.1);
+  filter: blur(10px);
+  z-index: 1;
+  animation: wave-rotate 15s linear infinite;
+}
+
+@keyframes wave-rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.blue-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+  margin-bottom: 24px;
+}
+
+.blue-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 18px;
+}
+
+.blue-uid {
+  font-size: 16px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.blue-card-stats-grid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+@media (min-width: 576px) {
+  .blue-card-stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.blue-stat-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.blue-stat-lbl {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.blue-stat-val {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: 800;
+}
+
+/* Referral link box */
+.referral-sharing-card {
+  padding: 16px 20px;
+}
+
+.invite-wrapper-inline {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.invite-link-input-inline {
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-glass);
+}
+
+.invite-link-input-inline input {
+  width: 100%;
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  padding: 12px 0;
+  outline: none;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.copy-link-btn-inline {
+  white-space: nowrap;
+  padding: 0 20px;
+  border-radius: var(--border-radius-md);
+}
+
+/* My Team rebates section */
+.flat-action-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-smooth);
+}
+
+.flat-action-btn:hover {
+  color: #ffffff;
+}
+
+.team-rebates-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.rebate-box-wrapper {
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  border-radius: var(--border-radius-md);
+  padding: 16px 20px;
+}
+
+.rebate-box-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+  margin-bottom: 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  padding-bottom: 10px;
+}
+
+.rebate-total {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.rebate-total strong {
+  color: var(--color-emerald);
+}
+
+.rebate-grid-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  text-align: center;
+}
+
+.rebate-col {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+
+.rebate-col:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  top: 10%;
+  height: 80%;
+  width: 1px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.rebate-col strong {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.rebate-col span {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Team Details */
+.pill-more-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: var(--transition-smooth);
+}
+
+.pill-more-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-glass-bright);
+  color: #ffffff;
+}
+
+.team-details-card {
+  padding: 30px;
+}
+
+.empty-state-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 0;
+  gap: 16px;
+}
+
+.empty-state-svg {
+  width: 90px;
+  height: 90px;
+}
+
+.empty-state-lbl {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* Inline Referred list */
+.team-members-list-inline {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.team-member-row-inline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.01);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-md);
+}
+
+.member-avatar-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--color-accent-light);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+}
+
+.member-details-inline {
+  flex-grow: 1;
+  margin-left: 14px;
+  display: flex;
+  flex-direction: column;
+}
+
+.member-name-inline {
+  font-size: 14px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.member-email-inline {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.member-meta-inline {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.member-date-inline {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.member-status-pill-inline {
+  font-size: 9px;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+
+.member-status-pill-inline.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--color-emerald);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+
+.member-status-pill-inline.inactive {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--border-glass);
+}

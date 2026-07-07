@@ -1,0 +1,237 @@
+.container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+}
+
+.particles {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: 
+    radial-gradient(circle at 15% 30%, rgba(99, 102, 241, 0.12) 0%, transparent 25%),
+    radial-gradient(circle at 85% 70%, rgba(14, 165, 233, 0.12) 0%, transparent 25%);
+  pointer-events: none;
+  animation: pulse 10s ease-in-out infinite alternate;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.8; }
+  100% { opacity: 1; transform: scale(1.05); }
+}
+
+.card {
+  background: var(--bg-card);
+  backdrop-filter: var(--backdrop-blur);
+  -webkit-backdrop-filter: var(--backdrop-blur);
+  border: 1px solid var(--border-glass);
+  padding: 30px;
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-premium), var(--shadow-inset-glow);
+  z-index: 1;
+}
+
+.logoContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+/* Large soft glowing circular halo behind the logo card */
+.logoHalo {
+  position: absolute;
+  top: 40px; /* Centered with respect to the 80px logoGlass */
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(74, 63, 175, 0.4) 0%, rgba(46, 42, 111, 0.15) 70%, transparent 100%);
+  filter: blur(12px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Dark navy rounded-square glass panel centered over the circle */
+.logoGlass {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 88px;
+  height: 88px;
+  background: rgba(6, 26, 58, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 26px;
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.5), 
+    inset 0 1px 1px rgba(255, 255, 255, 0.15);
+  margin-bottom: 14px;
+  z-index: 1;
+}
+
+/* Logo image inside the glass panel */
+.logo {
+  display: block;
+  width: 60px;
+  height: 60px;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 4px;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 0;
+  font-size: 14px;
+}
+
+.formGroup {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.inputWrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.inputIcon {
+  position: absolute;
+  left: 16px;
+  color: var(--text-muted);
+  font-size: 18px;
+}
+
+.input {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--border-glass);
+  padding: 14px 16px 14px 44px;
+  border-radius: var(--border-radius-md);
+  color: var(--text-primary);
+  font-size: 15px;
+  transition: var(--transition-smooth);
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--color-accent);
+  background: rgba(0, 0, 0, 0.3);
+  box-shadow: 0 0 15px rgba(99, 102, 241, 0.15);
+}
+
+.input::placeholder {
+  color: var(--text-muted);
+}
+
+.btn {
+  background: var(--gradient-main);
+  color: #ffffff;
+  border: none;
+  padding: 14px;
+  border-radius: var(--border-radius-md);
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  transition: var(--transition-smooth);
+  box-shadow: var(--shadow-glow);
+}
+
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(99, 102, 241, 0.5);
+  filter: brightness(1.1);
+}
+
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.passwordToggle {
+  position: absolute;
+  right: 16px;
+  color: var(--text-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.passwordToggle:hover {
+  color: var(--text-primary);
+}
+
+.errorText {
+  color: var(--color-rose);
+  font-size: 13px;
+  margin-top: 6px;
+  padding-left: 4px;
+}
+
+.footer {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+.link {
+  color: var(--color-accent-light);
+  text-decoration: none;
+  font-weight: 600;
+  margin-left: 6px;
+  transition: color 0.2s;
+}
+
+.link:hover {
+  color: var(--text-primary);
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+.spinner {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+}
+
+@media (max-width: 480px) {
+  .card {
+    padding: 30px 20px;
+  }
+}

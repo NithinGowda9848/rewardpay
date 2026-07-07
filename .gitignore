@@ -1,0 +1,24 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Local environment files
+.env
+.env.local
+.env*.local
+backend/.env
+
+# Logs and debug info
+*.log
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+.expo/
+dist/
+web-build/

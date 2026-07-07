@@ -1,0 +1,13 @@
+{
+  "name": "king-dom-workspace",
+  "version": "1.0.0",
+  "description": "Workspace for KING DOM backend and frontend",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix frontend && npm install --prefix mobile",
+    "dev": "npx concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "mobile:start": "npm run start --prefix mobile",
+    "mobile:android": "npm run android --prefix mobile",
+    "mobile:ios": "npm run ios --prefix mobile",
+    "dev:mobile": "npx concurrently \"npm run dev --prefix backend\" \"npm run start --prefix mobile\""
+  }
+}

@@ -1,0 +1,315 @@
+/* Dashboard Header Bar CSS */
+
+.dashboard-header-bar {
+  position: sticky;
+  top: 16px;
+  margin: 16px 24px 0 24px;
+  height: 64px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  z-index: 900;
+  background: rgba(22, 25, 41, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.back-btn-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.back-btn-icon:hover {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--color-accent-light);
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(99, 102, 241, 0.2);
+}
+
+.back-btn-icon:active {
+  transform: scale(0.95);
+}
+
+.header-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  background: var(--gradient-main);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header-logo-container {
+  display: flex;
+  align-items: center;
+}
+
+.header-logo {
+  height: 38px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3), 0 0 10px rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  transition: var(--transition-smooth);
+}
+
+.header-logo:hover {
+  transform: scale(1.05);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-action-btn {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-glass);
+  color: var(--text-secondary);
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.header-action-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-glass-bright);
+  color: #ffffff;
+}
+
+.header-action-btn.active {
+  background: rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.3);
+  color: var(--color-accent-light);
+}
+
+/* Telegram support button */
+.support-telegram-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.telegram-paperplane-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  transition: var(--transition-smooth);
+}
+
+.support-telegram-btn:hover .telegram-paperplane-circle {
+  background: var(--color-accent);
+  color: #ffffff;
+  box-shadow: var(--shadow-glow);
+  transform: scale(1.05);
+}
+
+.notif-badge {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-rose);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--color-rose);
+}
+
+.header-user-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: var(--gradient-main);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.2);
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.header-user-avatar:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+  border-color: rgba(255, 255, 255, 0.25);
+}
+
+.header-user-avatar:active {
+  transform: scale(0.95);
+}
+
+/* Notification Dropdown Panel */
+.notif-dropdown {
+  position: absolute;
+  top: 76px;
+  right: 0;
+  width: 320px;
+  z-index: 1100;
+  padding: 16px;
+  background: rgba(17, 20, 34, 0.95);
+  border: 1px solid var(--border-glass-bright);
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-premium), 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+}
+
+.notif-dropdown-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 8px;
+}
+
+.notif-dropdown-header h4 {
+  font-size: 15px;
+  color: #ffffff;
+}
+
+.clear-notif-btn {
+  background: transparent;
+  border: none;
+  color: var(--color-accent-light);
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.clear-notif-btn:hover {
+  text-decoration: underline;
+}
+
+.close-notif-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
+
+.close-notif-btn:hover {
+  color: #ffffff;
+}
+
+.notif-dropdown-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 280px;
+  overflow-y: auto;
+  gap: 8px;
+  padding-right: 4px;
+}
+
+.no-notif-text {
+  text-align: center;
+  padding: 24px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.notif-item {
+  display: flex;
+  padding: 10px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  border: 1px solid transparent;
+}
+
+.notif-item:hover {
+  background: rgba(255, 255, 255, 0.03);
+  border-color: rgba(255, 255, 255, 0.05);
+}
+
+.notif-item.unread {
+  background: rgba(99, 102, 241, 0.05);
+}
+
+.notif-item-dot-container {
+  width: 14px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-top: 5px;
+}
+
+.unread-dot-indicator {
+  width: 6px;
+  height: 6px;
+  background-color: var(--color-sky);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--color-sky);
+}
+
+.notif-item-body {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-grow: 1;
+}
+
+.notif-item-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.notif-item-msg {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+.notif-item-time {
+  font-size: 9px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* Adjust header spacing for desktop sidebar layout */
+@media (min-width: 768px) {
+  .dashboard-header-bar {
+    margin-left: 280px;
+  }
+}
