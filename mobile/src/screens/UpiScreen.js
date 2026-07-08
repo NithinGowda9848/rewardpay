@@ -74,7 +74,7 @@ export default function UpiScreen({ navigation, route }) {
         if (targetApp === 'paytm') {
           webUrl = 'https://paytm.com';
         } else if (targetApp === 'phonepe') {
-          webUrl = 'https://phonepe.com';
+          webUrl = 'https://www.phonepe.com/';
         }
         await Linking.openURL(webUrl);
       }
@@ -84,7 +84,7 @@ export default function UpiScreen({ navigation, route }) {
       if (targetApp === 'paytm') {
         webUrl = 'https://paytm.com';
       } else if (targetApp === 'phonepe') {
-        webUrl = 'https://phonepe.com';
+        webUrl = 'https://www.phonepe.com/';
       }
       try {
         await Linking.openURL(webUrl);

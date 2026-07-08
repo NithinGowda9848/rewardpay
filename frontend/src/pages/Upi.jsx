@@ -257,7 +257,7 @@ const Upi = () => {
       if (app === 'paytm') {
         webUrl = 'https://paytm.com';
       } else if (app === 'phonepe') {
-        webUrl = 'https://phonepe.com';
+        webUrl = 'https://www.phonepe.com/';
       }
       window.open(webUrl, '_blank');
       return;
