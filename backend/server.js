@@ -35,7 +35,17 @@ const limiter = rateLimit({
   legacyHeaders: false, // Disable the `X-RateLimit-*` headers
 });
 app.use('/api/', limiter);
-app.use(cors());
+app.use(cors({
+  origin: [
+    'https://tranquil-starship-6a6da5.netlify.app',
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://localhost:5000'
+  ],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
