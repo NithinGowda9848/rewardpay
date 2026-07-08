@@ -7,7 +7,10 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app requires access to your photo library to let you upload deposit/payment screenshots."
+      }
     },
     "android": {
       "adaptiveIcon": {

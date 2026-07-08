@@ -322,7 +322,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
     color: '#ffffff',
     letterSpacing: -0.5,
-    fontFamily: Platform.OS === 'ios' ? 'Outfit' : 'sans-serif-condensed',
+    fontFamily: Platform.OS === 'ios' ? undefined : 'sans-serif-condensed',
   },
   subtitle: {
     fontSize: 14,
