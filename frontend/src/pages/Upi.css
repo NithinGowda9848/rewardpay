@@ -755,14 +755,17 @@
   margin-top: 15px;
 }
 
-.paytm-pay-btn {
+.paytm-pay-btn,
+.phonepe-pay-btn,
+.gpay-pay-btn,
+.bhim-pay-btn,
+.amazon-pay-btn,
+.cred-pay-btn,
+.generic-upi-pay-btn {
   display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: #00baf2;
-  /* Paytm Blue brand color */
-  background: linear-gradient(135deg, #00baf2 0%, #002970 100%);
   color: #ffffff !important;
   border: none;
   font-family: inherit;
@@ -775,9 +778,12 @@
   transition: var(--transition-smooth);
   width: 100%;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 186, 242, 0.3);
 }
 
+.paytm-pay-btn {
+  background: linear-gradient(135deg, #00baf2 0%, #002970 100%);
+  box-shadow: 0 4px 12px rgba(0, 186, 242, 0.3);
+}
 .paytm-pay-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 186, 242, 0.5);
@@ -785,56 +791,61 @@
 }
 
 .phonepe-pay-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #5f259f;
-  /* PhonePe Purple brand color */
   background: linear-gradient(135deg, #5f259f 0%, #3a116c 100%);
-  color: #ffffff !important;
-  border: none;
-  font-family: inherit;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 700;
-  padding: 12px 20px;
-  border-radius: var(--border-radius-md);
-  transition: var(--transition-smooth);
-  width: 100%;
-  text-align: center;
   box-shadow: 0 4px 12px rgba(95, 37, 159, 0.3);
 }
-
 .phonepe-pay-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(95, 37, 159, 0.5);
   filter: brightness(1.1);
 }
 
-.generic-upi-pay-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #0f172a;
-  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-  border: 1px solid var(--border-glass);
-  color: #ffffff !important;
-  font-family: inherit;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 700;
-  padding: 12px 20px;
-  border-radius: var(--border-radius-md);
-  transition: var(--transition-smooth);
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+.gpay-pay-btn {
+  background: linear-gradient(135deg, #1a73e8 0%, #0d47a1 100%);
+  box-shadow: 0 4px 12px rgba(26, 115, 232, 0.3);
+}
+.gpay-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(26, 115, 232, 0.5);
+  filter: brightness(1.1);
 }
 
+.bhim-pay-btn {
+  background: linear-gradient(135deg, #f37021 0%, #116a36 100%);
+  box-shadow: 0 4px 12px rgba(243, 112, 33, 0.3);
+}
+.bhim-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(243, 112, 33, 0.5);
+  filter: brightness(1.1);
+}
+
+.amazon-pay-btn {
+  background: linear-gradient(135deg, #ff9900 0%, #ff5500 100%);
+  box-shadow: 0 4px 12px rgba(255, 153, 0, 0.3);
+}
+.amazon-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 153, 0, 0.5);
+  filter: brightness(1.1);
+}
+
+.cred-pay-btn {
+  background: linear-gradient(135deg, #1e1e1e 0%, #000000 100%);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+.cred-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 255, 255, 0.15);
+  filter: brightness(1.1);
+}
+
+.generic-upi-pay-btn {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid var(--border-glass);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
 .generic-upi-pay-btn:hover {
   transform: translateY(-2px);
   background: linear-gradient(135deg, #334155 0%, #1e293b 100%);

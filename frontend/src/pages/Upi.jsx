@@ -15,7 +15,9 @@ import {
   FaQuestionCircle, 
   FaImage,
   FaMobileAlt,
-  FaDownload
+  FaDownload,
+  FaWallet,
+  FaGoogle
 } from 'react-icons/fa';
 import './Upi.css';
 
@@ -78,6 +80,19 @@ const Upi = () => {
       setActiveTab('deposit');
     }
   }, [location.state]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const notInstalled = params.get('not_installed');
+    if (notInstalled) {
+      if (notInstalled === 'any') {
+        setFormError('No UPI applications are available on this device.');
+      } else {
+        setFormError('Selected UPI app is not installed on this device.');
+      }
+      window.history.replaceState({}, document.title, window.location.pathname);
+    }
+  }, [location.search]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -218,32 +233,108 @@ const Upi = () => {
   // copyQrImage removed
 
   const getUpiUrl = (targetApp = 'generic') => {
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    const fallbackUrl = encodeURIComponent(window.location.origin + window.location.pathname + `?not_installed=${targetApp}`);
+    
     if (targetApp === 'paytm') {
-      return `paytmmp://`;
+      if (isAndroid) {
+        return `intent://#Intent;scheme=paytmmp;package=net.one97.paytm;S.browser_fallback_url=${fallbackUrl};end`;
+      } else {
+        return `paytmmp://`;
+      }
     }
 
     if (targetApp === 'phonepe') {
-      return `phonepe://`;
+      if (isAndroid) {
+        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;S.browser_fallback_url=${fallbackUrl};end`;
+      } else {
+        return `phonepe://`;
+      }
     }
 
     if (targetApp === 'gpay') {
-      return `gpay://`;
+      if (isAndroid) {
+        return `intent://#Intent;scheme=gpay;package=com.google.android.apps.nbu.paisa.user;S.browser_fallback_url=${fallbackUrl};end`;
+      } else {
+        return `gpay://`;
+      }
     }
 
-    // Generic fallback to launch UPI app chooser
-    return `upi://`;
+    if (targetApp === 'bhim') {
+      if (isAndroid) {
+        return `intent://#Intent;scheme=bhim;package=in.org.npci.upiapp;S.browser_fallback_url=${fallbackUrl};end`;
+      } else {
+        return `bhim://`;
+      }
+    }
+
+    if (targetApp === 'amazonpay') {
+      if (isAndroid) {
+        return `intent://#Intent;scheme=amazonpay;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=${fallbackUrl};end`;
+      } else {
+        return `amazonpay://`;
+      }
+    }
+
+    if (targetApp === 'cred') {
+      if (isAndroid) {
+        return `intent://#Intent;scheme=cred;package=com.dreamplug.androidapp;S.browser_fallback_url=${fallbackUrl};end`;
+      } else {
+        return `cred://`;
+      }
+    }
+
+    // Generic fallback to launch UPI app chooser without prefilling UPI ID
+    if (isAndroid) {
+      const genericFallback = encodeURIComponent(window.location.origin + window.location.pathname + `?not_installed=any`);
+      return `intent://#Intent;scheme=upi;S.browser_fallback_url=${genericFallback};end`;
+    } else {
+      return `upi://`;
+    }
   };
 
   const handleUpiPayment = (e, app = 'generic') => {
     e.preventDefault();
+    setFormError('');
     
     // Copy the UPI ID to clipboard
     navigator.clipboard.writeText('kesavaroyal117-1@okicici');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (!isMobile) {
+      alert("UPI ID 'kesavaroyal117-1@okicici' copied to clipboard! Paste it inside your UPI app to complete payment.");
+      return;
+    }
     
     const url = getUpiUrl(app);
-    window.location.href = url;
+    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+    
+    if (isIOS) {
+      const start = Date.now();
+      let hasBlurred = false;
+      
+      const handleBlur = () => {
+        hasBlurred = true;
+      };
+      
+      window.addEventListener('blur', handleBlur);
+      window.location.href = url;
+      
+      setTimeout(() => {
+        window.removeEventListener('blur', handleBlur);
+        if (!hasBlurred && (Date.now() - start < 1500)) {
+          if (app === 'generic') {
+            setFormError('No UPI applications are available on this device.');
+          } else {
+            setFormError('Selected UPI app is not installed on this device.');
+          }
+        }
+      }, 1200);
+    } else {
+      window.location.href = url;
+    }
   };
 
   if (loading) {
@@ -323,14 +414,26 @@ const Upi = () => {
                     </div>
 
                     <div className="direct-pay-apps">
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'paytm')} className="paytm-pay-btn">
-                        <FaMobileAlt /> Pay via Paytm
-                      </button>
                       <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
-                        <FaMobileAlt /> Pay via PhonePe
+                        <FaWallet /> Open PhonePe
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'paytm')} className="paytm-pay-btn">
+                        <FaMobileAlt /> Open Paytm
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'gpay')} className="gpay-pay-btn">
+                        <FaGoogle /> Open Google Pay
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'bhim')} className="bhim-pay-btn">
+                        <FaMobileAlt /> Open BHIM UPI
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'amazonpay')} className="amazon-pay-btn">
+                        <FaMobileAlt /> Open Amazon Pay
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'cred')} className="cred-pay-btn">
+                        <FaMobileAlt /> Open CRED
                       </button>
                       <button type="button" onClick={(e) => handleUpiPayment(e, 'generic')} className="generic-upi-pay-btn">
-                        <FaMobileAlt /> Pay via Other UPI Apps
+                        <FaMobileAlt /> Open Other UPI Apps
                       </button>
                     </div>
                   </div>
