@@ -252,12 +252,12 @@ const Upi = () => {
       url += `&am=${amtValue}`;
     }
     
-    if (targetApp === 'phonepe') {
+    if (targetApp === 'paytm') {
       const isAndroid = /Android/i.test(navigator.userAgent);
       if (isAndroid) {
-        return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=com.phonepe.app;end`;
+        return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=net.one97.paytm;end`;
       } else {
-        return `phonepe://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
+        return `paytmmp://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
       }
     }
     return url;
@@ -365,6 +365,15 @@ const Upi = () => {
                         <FaCopy /> {copied ? 'Copied' : 'Copy'}
                       </button>
                     </div>
+
+                    <div className="direct-pay-apps">
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'paytm')} className="paytm-pay-btn">
+                        <FaMobileAlt /> Pay via Paytm
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'generic')} className="generic-upi-pay-btn">
+                        <FaMobileAlt /> Pay via Other UPI Apps
+                      </button>
+                    </div>
                   </div>
                 </div>
 
@@ -436,7 +445,7 @@ const Upi = () => {
                       <h5>Deposit Guidelines</h5>
                       <ul>
                         <li>1. Copy the UPI ID: <strong>kesavaroyal117-1@okicici</strong>.</li>
-                        <li>2. Use PhonePe or any other UPI app to make the payment.</li>
+                        <li>2. Use Paytm, PhonePe, or any other UPI app to make the payment.</li>
                         <li>3. Enter the payment amount and complete the transaction.</li>
                         <li>4. Copy the <strong>12-digit UTR / Reference ID</strong> from payment receipt.</li>
                         <li>5. Take a screenshot of the successful payment screen.</li>
