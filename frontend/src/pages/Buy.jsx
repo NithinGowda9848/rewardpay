@@ -5,7 +5,7 @@ import API from '../services/api';
 import GlassCard from '../components/GlassCard';
 import SuccessModal from '../components/SuccessModal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { FaCalendarAlt, FaCoins, FaCheckCircle, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCalendarAlt, FaCoins, FaCheckCircle, FaExclamationTriangle, FaMobileAlt, FaCopy, FaUpload, FaSpinner, FaImage, FaLink } from 'react-icons/fa';
 import './Buy.css';
 
 const getBackendHost = () => {
@@ -30,6 +30,16 @@ const Buy = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalMsg, setModalMsg] = useState('');
   const [purchaseError, setPurchaseError] = useState('');
+
+  // Deposit Modal states
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [selectedPkg, setSelectedPkg] = useState(null);
+  const [copied, setCopied] = useState(false);
+  const [utr, setUtr] = useState('');
+  const [screenshot, setScreenshot] = useState('');
+  const [screenshotPreview, setScreenshotPreview] = useState('');
+  const [txLoading, setTxLoading] = useState(false);
+  const [formError, setFormError] = useState('');
 
   const categories = [
     'ALL',
@@ -387,11 +397,95 @@ const Buy = () => {
     }
   };
 
+  const copyUpiAddress = () => {
+    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const getUpiUrl = (targetApp = 'generic') => {
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    if (targetApp === 'phonepe') {
+      if (isAndroid) {
+        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;end`;
+      } else {
+        return `phonepe://`;
+      }
+    }
+    return `upi://pay`;
+  };
+
+  const handleUpiPayment = (e, app = 'generic') => {
+    e.preventDefault();
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (!isMobile) {
+      let webUrl = 'https://www.bhimupi.org.in';
+      if (app === 'phonepe') {
+        webUrl = 'https://phonepe.com';
+      }
+      window.open(webUrl, '_blank');
+      return;
+    }
+    const url = getUpiUrl(app);
+    window.location.href = url;
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setScreenshot(reader.result);
+        setScreenshotPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleDepositSubmit = async (e) => {
+    e.preventDefault();
+    setFormError('');
+
+    if (!utr || utr.length !== 12) {
+      setFormError('Please enter a valid 12-digit UTR number.');
+      return;
+    }
+
+    if (!screenshot) {
+      setFormError('Please upload a payment screenshot.');
+      return;
+    }
+
+    setTxLoading(true);
+    try {
+      const res = await API.post('/wallet/deposit', {
+        amount: selectedPkg.price,
+        utr,
+        screenshot
+      });
+
+      if (res.data.success) {
+        setModalTitle('Deposit Submitted!');
+        setModalMsg(`Your deposit of ₹${selectedPkg.price} has been submitted for validation. Once approved (usually within 30 minutes), your wallet will be credited, and you can purchase the ${selectedPkg.name}.`);
+        setIsModalOpen(true);
+        setShowDepositModal(false);
+        setUtr('');
+        setScreenshot('');
+        setScreenshotPreview('');
+      }
+    } catch (err) {
+      setFormError(err.response?.data?.message || 'Deposit submission failed. Please try again.');
+    } finally {
+      setTxLoading(false);
+    }
+  };
+
   const handleInvestClick = (pkg) => {
     if (user && user.walletBalance >= pkg.price) {
       handleBuy(pkg);
     } else {
-      navigate('/upi', { state: { amount: pkg.price } });
+      setSelectedPkg(pkg);
+      setShowDepositModal(true);
     }
   };
 
@@ -601,6 +695,92 @@ const Buy = () => {
         title={modalTitle}
         message={modalMsg}
       />
+
+      {/* Deposit Modal */}
+      {showDepositModal && (
+        <div className="buy-modal-overlay">
+          <GlassCard className="buy-deposit-modal animate-fade-in">
+            <div className="buy-modal-header">
+              <h3>Deposit & Invest</h3>
+              <button type="button" className="close-modal-btn" onClick={() => setShowDepositModal(false)}>&times;</button>
+            </div>
+            
+            <div className="buy-modal-body">
+              <p className="buy-modal-subtext">You need to add funds to purchase <strong>{selectedPkg?.name}</strong>.</p>
+              
+              <div className="deposit-amount-row">
+                <span>Amount to Pay:</span>
+                <strong>₹{selectedPkg?.price}</strong>
+              </div>
+
+              <div className="merchant-info-box">
+                <span className="merchant-lbl">Merchant Name: <strong style={{ color: '#ffffff' }}>Akula kesava</strong></span>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%', marginTop: '6px' }}>
+                  <span className="merchant-lbl">Merchant UPI: <strong>kesavaroyal117-1@okicici</strong></span>
+                  <button type="button" onClick={copyUpiAddress} className="copy-btn-mini">
+                    <FaCopy /> {copied ? 'Copied' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
+              <div className="direct-pay-apps">
+                <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
+                  <FaMobileAlt /> Pay via PhonePe
+                </button>
+                <button type="button" onClick={(e) => handleUpiPayment(e, 'generic')} className="generic-upi-pay-btn">
+                  <FaMobileAlt /> Pay via Other UPI Apps
+                </button>
+              </div>
+
+              {formError && <div className="upi-form-error animate-fade-in" style={{ marginTop: '10px' }}>{formError}</div>}
+
+              <form onSubmit={handleDepositSubmit} className="modal-deposit-form">
+                <div className="upi-input-group">
+                  <label>12-Digit UTR / Transaction ID</label>
+                  <input
+                    type="text"
+                    maxLength="12"
+                    className="input-field"
+                    placeholder="Enter 12-digit UTR code"
+                    value={utr}
+                    onChange={(e) => setUtr(e.target.value)}
+                    required
+                  />
+                </div>
+
+                <div className="upi-input-group">
+                  <label>Payment Screenshot</label>
+                  <div className="screenshot-upload-zone">
+                    <input
+                      id="modal-screenshot-input"
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      style={{ display: 'none' }}
+                      required
+                    />
+                    <label htmlFor="modal-screenshot-input" className="upload-label">
+                      <FaUpload className="upload-icon" />
+                      <span>{screenshot ? 'Change Screenshot' : 'Upload Screenshot'}</span>
+                    </label>
+                  </div>
+                  {screenshotPreview && (
+                    <div className="screenshot-preview-container animate-fade-in" style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
+                      <img src={screenshotPreview} alt="Screenshot Preview" className="screenshot-preview" style={{ maxWidth: '120px', borderRadius: '8px', border: '1px solid var(--border-glass-bright)' }} />
+                    </div>
+                  )}
+                </div>
+
+                <div className="submit-action-container" style={{ marginTop: '15px' }}>
+                  <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading} style={{ width: '100%' }}>
+                    {txLoading ? <FaSpinner className="spin" /> : 'Submit Deposit'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </GlassCard>
+        </div>
+      )}
     </div>
   );
 };

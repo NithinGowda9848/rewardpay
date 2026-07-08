@@ -412,3 +412,281 @@
   font-size: 11px;
   color: var(--text-muted);
 }
+
+/* Buy Page Deposit Modal Styles */
+.buy-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(15, 23, 42, 0.85);
+  backdrop-filter: blur(12px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+}
+
+.buy-deposit-modal {
+  width: 100%;
+  max-width: 460px;
+  max-height: 90vh;
+  overflow-y: auto;
+  padding: 24px !important;
+  background: var(--bg-secondary) !important;
+  border: 1px solid var(--border-glass-bright) !important;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4) !important;
+  border-radius: var(--border-radius-lg) !important;
+}
+
+.buy-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid var(--border-glass);
+  padding-bottom: 12px;
+  margin-bottom: 16px;
+}
+
+.buy-modal-header h3 {
+  font-size: 18px;
+  color: #ffffff;
+  margin: 0;
+  font-weight: 700;
+}
+
+.close-modal-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 24px;
+  cursor: pointer;
+  line-height: 1;
+  transition: var(--transition-smooth);
+}
+
+.close-modal-btn:hover {
+  color: #ffffff;
+}
+
+.buy-modal-subtext {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.deposit-amount-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-glass);
+  padding: 12px 16px;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.deposit-amount-row span {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.deposit-amount-row strong {
+  font-size: 20px;
+  color: var(--color-accent-light);
+}
+
+/* Copied direct payment app styles for Buy Page */
+.direct-pay-apps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: 100%;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+
+.phonepe-pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #5f259f;
+  background: linear-gradient(135deg, #5f259f 0%, #3a116c 100%);
+  color: #ffffff !important;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-smooth);
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(95, 37, 159, 0.3);
+}
+
+.phonepe-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(95, 37, 159, 0.5);
+  filter: brightness(1.1);
+}
+
+.generic-upi-pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #0f172a;
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  border: 1px solid var(--border-glass);
+  color: #ffffff !important;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-smooth);
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.generic-upi-pay-btn:hover {
+  transform: translateY(-2px);
+  background: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4);
+}
+
+.merchant-info-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-glass);
+  border-radius: var(--border-radius-md);
+  padding: 12px;
+  margin-bottom: 12px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.merchant-info-box strong {
+  color: #ffffff;
+}
+
+.copy-btn-mini {
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  color: var(--color-accent-light);
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  transition: var(--transition-smooth);
+}
+
+.copy-btn-mini:hover {
+  background: var(--color-accent);
+  color: #ffffff;
+}
+
+/* Modal Form Fields */
+.modal-deposit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-deposit-form .upi-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+}
+
+.modal-deposit-form .upi-input-group label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.modal-deposit-form .input-field {
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid var(--border-glass);
+  color: #ffffff;
+  padding: 12px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  transition: var(--transition-smooth);
+}
+
+.modal-deposit-form .input-field:focus {
+  outline: none;
+  border-color: var(--color-accent-light);
+  box-shadow: 0 0 8px rgba(99, 102, 241, 0.3);
+}
+
+.modal-deposit-form .screenshot-upload-zone {
+  border: 1px dashed var(--border-glass);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.01);
+  transition: var(--transition-smooth);
+}
+
+.modal-deposit-form .screenshot-upload-zone:hover {
+  border-color: var(--color-accent-light);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.modal-deposit-form .upload-label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.modal-deposit-form .upload-icon {
+  font-size: 20px;
+  color: var(--color-accent-light);
+}
+
+.modal-deposit-form .upi-submit-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 700;
+}
+
+.modal-deposit-form .spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.upi-form-error {
+  background: rgba(244, 63, 94, 0.1);
+  border: 1px solid rgba(244, 63, 94, 0.3);
+  color: #f43f5e;
+  padding: 10px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-align: left;
+}
