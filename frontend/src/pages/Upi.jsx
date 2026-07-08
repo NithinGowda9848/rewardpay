@@ -322,21 +322,11 @@ const Upi = () => {
                 <div className="deposit-qr-column">
                   <div className="qr-box-wrapper">
                     <h4>UPI Payment</h4>
-                    <p className="qr-subtext">Copy the UPI ID below to pay, or use direct payment apps.</p>
+                    <p className="qr-subtext">Select your preferred payment app below to pay.</p>
 
                     <div style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Amount to Pay</span>
                       <span style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
-                    </div>
-
-                    <div className="merchant-address-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
-                      <span className="merchant-lbl">Merchant Name: <strong style={{ color: '#ffffff' }}>Akula kesava</strong></span>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                        <span className="merchant-lbl">Merchant UPI: <strong>kesavaroyal117-1@okicici</strong></span>
-                        <button type="button" onClick={copyUpiAddress} className="copy-btn-mini">
-                          <FaCopy /> {copied ? 'Copied' : 'Copy'}
-                        </button>
-                      </div>
                     </div>
 
                     <div className="direct-pay-apps">
@@ -362,10 +352,6 @@ const Upi = () => {
                         <FaMobileAlt /> Pay via PayZapp
                       </button>
                     </div>
-
-                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '15px', textAlign: 'center', lineHeight: '1.5' }}>
-                      * UPI ID is auto-copied to clipboard. If the app opens to the search page (like in the referral screen), simply paste and proceed.
-                    </p>
                   </div>
                 </div>
 
@@ -436,12 +422,11 @@ const Upi = () => {
                     <div className="deposit-guidelines-box animate-fade-in" style={{ marginTop: '20px' }}>
                       <h5>Deposit Guidelines</h5>
                       <ul>
-                        <li>1. Copy the UPI ID: <strong>kesavaroyal117-1@okicici</strong>.</li>
-                        <li>2. Use Paytm, PhonePe, or any other UPI app to make the payment.</li>
-                        <li>3. Enter the payment amount and complete the transaction.</li>
-                        <li>4. Copy the <strong>12-digit UTR / Reference ID</strong> from payment receipt.</li>
-                        <li>5. Take a screenshot of the successful payment screen.</li>
-                        <li>6. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
+                        <li>1. Choose Paytm, PhonePe, or Other UPI Apps below to make the payment.</li>
+                        <li>2. Complete the transaction directly in the payment app.</li>
+                        <li>3. Copy the <strong>12-digit UTR / Reference ID</strong> from the payment receipt.</li>
+                        <li>4. Take a screenshot of the successful payment screen.</li>
+                        <li>5. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
                       </ul>
                       <a
                         href="https://t.me/Rewardpayindia"

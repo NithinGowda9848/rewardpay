@@ -301,7 +301,7 @@ export default function UpiScreen({ navigation, route }) {
 
               <TouchableOpacity onPress={handleUpiPress} style={styles.upiCopyRow}>
                 <View style={styles.upiLabelCol}>
-                  <Text style={styles.upiLabel}>Official UPI ID (Tap to Pay)</Text>
+                  <Text style={styles.upiLabel}>Official UPI ID</Text>
                   <Text style={styles.upiValue}>{companyUpi}</Text>
                 </View>
                 <TouchableOpacity
