@@ -220,51 +220,50 @@ const Upi = () => {
   const getUpiUrl = (targetApp = 'generic') => {
     const baseAddress = 'kesavaroyal117-1@okicici';
     const pn = 'Akula kesava';
-    const amtValue = amount && parseFloat(amount) > 0 ? parseFloat(amount) : null;
     
     const isAndroid = /Android/i.test(navigator.userAgent);
     
-    let url = `upi://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit`;
-    if (amtValue) {
-      url += `&am=${amtValue}`;
-    }
-    
     if (targetApp === 'paytm') {
       if (isAndroid) {
-        return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=net.one97.paytm;end`;
+        return `intent://#Intent;scheme=paytmmp;package=net.one97.paytm;end`;
       } else {
-        return `paytmmp://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
+        return `paytmmp://`;
       }
     }
 
     if (targetApp === 'phonepe') {
       if (isAndroid) {
-        return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=com.phonepe.app;end`;
+        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;end`;
       } else {
-        return `phonepe://upi/pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
+        return `phonepe://`;
       }
     }
 
     if (targetApp === 'gpay') {
       if (isAndroid) {
-        return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
+        return `intent://#Intent;scheme=gpay;package=com.google.android.apps.nbu.paisa.user;end`;
       } else {
-        return `gpay://upi/pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
+        return `gpay://`;
       }
     }
-    return url;
+
+    // Generic fallback without amount
+    return `upi://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit`;
   };
 
   const handleUpiPayment = (e, app = 'generic') => {
     e.preventDefault();
+    
+    // Copy the UPI ID to clipboard
+    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (!isMobile) {
-      alert("Direct UPI redirection is only supported on mobile devices. Please copy the UPI ID below to pay.");
+      alert("UPI ID 'kesavaroyal117-1@okicici' copied to clipboard! Paste it inside your UPI app to complete payment.");
       return;
     }
-    
-    // Auto-copy the UPI address to clipboard first
-    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
     
     const url = getUpiUrl(app);
     window.location.href = url;
@@ -357,9 +356,6 @@ const Upi = () => {
                         <FaMobileAlt /> Pay via Other UPI Apps
                       </button>
                     </div>
-                    <p className="qr-subtext" style={{ marginTop: '14px', fontSize: '11px', lineHeight: '1.4', color: 'rgba(255, 255, 255, 0.45)', textAlign: 'center' }}>
-                      * UPI ID is auto-copied to clipboard. If the app opens to the search page (like in the referral screen), simply paste and proceed.
-                    </p>
                   </div>
                 </div>
 

@@ -54,19 +54,28 @@ export default function UpiScreen({ navigation, route }) {
 
   const companyUpi = 'kesavaroyal117-1@okicici';
 
-  const handleUpiPress = async () => {
-    const upiUrl = `upi://pay?pa=${companyUpi}&pn=${encodeURIComponent('Akula kesava')}&am=${amount || '0'}&cu=INR`;
+  const handleUpiPress = async (targetApp = 'generic') => {
+    // Proactively copy the UPI ID to clipboard
+    await Clipboard.setStringAsync(companyUpi);
+
+    let upiUrl = `upi://pay?pa=${companyUpi}&pn=${encodeURIComponent('Akula kesava')}&cu=INR`;
+    if (targetApp === 'phonepe') {
+      upiUrl = 'phonepe://';
+    } else if (targetApp === 'paytm') {
+      upiUrl = 'paytmmp://';
+    } else if (targetApp === 'gpay') {
+      upiUrl = 'gpay://';
+    }
+
     try {
       const supported = await Linking.canOpenURL(upiUrl);
       if (supported) {
         await Linking.openURL(upiUrl);
       } else {
-        await Clipboard.setStringAsync(companyUpi);
-        Alert.alert('UPI ID Copied', 'No direct UPI apps found on this device. UPI ID has been copied to your clipboard.');
+        Alert.alert('UPI ID Copied', 'UPI ID has been copied to your clipboard! Paste it inside your UPI app to pay.');
       }
     } catch (err) {
-      await Clipboard.setStringAsync(companyUpi);
-      Alert.alert('UPI ID Copied', 'UPI ID copied to clipboard. Paste it in PhonePe or Google Pay to complete payment.');
+      Alert.alert('UPI ID Copied', 'UPI ID has been copied to your clipboard! Paste it inside your UPI app to pay.');
     }
   };
 
@@ -305,11 +314,19 @@ export default function UpiScreen({ navigation, route }) {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={handleUpiPress}
+                onPress={() => handleUpiPress('paytm')}
+                style={styles.paytmBtn}
+              >
+                <FontAwesome5 name="mobile-alt" size={14} color="#ffffff" style={{ marginRight: 8 }} />
+                <Text style={styles.paytmBtnText}>Pay via Paytm</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                onPress={() => handleUpiPress('phonepe')}
                 style={styles.phonepeBtn}
               >
                 <FontAwesome5 name="wallet" size={14} color="#ffffff" style={{ marginRight: 8 }} />
-                <Text style={styles.phonepeBtnText}>Pay via PhonePe / UPI App</Text>
+                <Text style={styles.phonepeBtnText}>Pay via PhonePe</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -831,6 +848,26 @@ const styles = StyleSheet.create({
   submitBtnText: {
     color: '#ffffff',
     fontSize: 15,
+    fontWeight: '700',
+  },
+  paytmBtn: {
+    backgroundColor: '#00baf2',
+    height: 48,
+    borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 12,
+    marginBottom: 4,
+    shadowColor: '#00baf2',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  paytmBtnText: {
+    color: '#ffffff',
+    fontSize: 14,
     fontWeight: '700',
   },
   phonepeBtn: {
