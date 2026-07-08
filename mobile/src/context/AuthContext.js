@@ -70,6 +70,17 @@ export const AuthProvider = ({ children }) => {
     return user;
   };
 
+  useEffect(() => {
+    if (!user) return;
+
+    // Poll to refresh user profile (including wallet balance and earnings) every 30 seconds
+    const interval = setInterval(() => {
+      refreshUser();
+    }, 30000);
+
+    return () => clearInterval(interval);
+  }, [user]);
+
   return (
     <AuthContext.Provider value={{ user, login, register, logout, refreshUser, loading }}>
       {!loading && children}

@@ -387,6 +387,14 @@ const Buy = () => {
     }
   };
 
+  const handleInvestClick = (pkg) => {
+    if (user && user.walletBalance >= pkg.price) {
+      handleBuy(pkg);
+    } else {
+      navigate('/upi', { state: { amount: pkg.price } });
+    }
+  };
+
   const scrollToHistory = () => {
     const section = document.getElementById('active-investments-section');
     if (section) {
@@ -519,13 +527,7 @@ const Buy = () => {
 
                 {/* Bottom Action: Invest Now Button */}
                 <button
-                  onClick={() => {
-                    if (user && user.walletBalance >= pkg.price) {
-                      handleBuy(pkg);
-                    } else {
-                      navigate('/upi', { state: { amount: pkg.price } });
-                    }
-                  }}
+                  onClick={() => handleInvestClick(pkg)}
                   className="btn-primary prod-invest-now-btn"
                   disabled={purchaseLoading === pkg._id}
                 >
