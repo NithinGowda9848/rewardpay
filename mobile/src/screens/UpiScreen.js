@@ -55,9 +55,6 @@ export default function UpiScreen({ navigation, route }) {
   const companyUpi = 'kesavaroyal117-1@okicici';
 
   const handleUpiPress = async (targetApp = 'generic') => {
-    // Proactively copy the UPI ID to clipboard
-    await Clipboard.setStringAsync(companyUpi);
-
     let upiUrl = 'upi://pay';
     if (targetApp === 'phonepe') {
       upiUrl = 'phonepe://';
@@ -72,10 +69,10 @@ export default function UpiScreen({ navigation, route }) {
       if (supported) {
         await Linking.openURL(upiUrl);
       } else {
-        Alert.alert('UPI ID Copied', 'UPI ID has been copied to your clipboard! Paste it inside your UPI app to pay.');
+        Alert.alert('Error', 'Selected payment app is not installed on your device.');
       }
     } catch (err) {
-      Alert.alert('UPI ID Copied', 'UPI ID has been copied to your clipboard! Paste it inside your UPI app to pay.');
+      Alert.alert('Error', 'Selected payment app is not installed on your device.');
     }
   };
 
