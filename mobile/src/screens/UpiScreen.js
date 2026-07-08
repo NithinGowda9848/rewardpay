@@ -54,19 +54,42 @@ export default function UpiScreen({ navigation, route }) {
 
   const companyUpi = 'kesavaroyal117-1@okicici';
 
-  const handleUpiPress = async () => {
-    const upiUrl = `upi://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
+  const handlePaytmPress = async () => {
+    const paytmUrl = `paytmmp://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
+    const genericUpiUrl = `upi://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
+    
     try {
-      const supported = await Linking.canOpenURL(upiUrl);
+      const supported = await Linking.canOpenURL(paytmUrl);
       if (supported) {
-        await Linking.openURL(upiUrl);
+        await Linking.openURL(paytmUrl);
+      } else {
+        const genericSupported = await Linking.canOpenURL(genericUpiUrl);
+        if (genericSupported) {
+          await Linking.openURL(genericUpiUrl);
+        } else {
+          await Clipboard.setStringAsync(companyUpi);
+          Alert.alert('UPI ID Copied', 'Paytm or other UPI apps not found. UPI ID has been copied to your clipboard.');
+        }
+      }
+    } catch (err) {
+      await Clipboard.setStringAsync(companyUpi);
+      Alert.alert('UPI ID Copied', 'UPI ID copied to clipboard. Paste it in Paytm to complete payment.');
+    }
+  };
+
+  const handleGenericUpiPress = async () => {
+    const genericUpiUrl = `upi://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
+    try {
+      const supported = await Linking.canOpenURL(genericUpiUrl);
+      if (supported) {
+        await Linking.openURL(genericUpiUrl);
       } else {
         await Clipboard.setStringAsync(companyUpi);
         Alert.alert('UPI ID Copied', 'No direct UPI apps found on this device. UPI ID has been copied to your clipboard.');
       }
     } catch (err) {
       await Clipboard.setStringAsync(companyUpi);
-      Alert.alert('UPI ID Copied', 'UPI ID copied to clipboard. Paste it in PhonePe or Google Pay to complete payment.');
+      Alert.alert('UPI ID Copied', 'UPI ID copied to clipboard.');
     }
   };
 
@@ -299,25 +322,29 @@ export default function UpiScreen({ navigation, route }) {
                 </TouchableOpacity>
               </TouchableOpacity>
 
-              {/* QR Image Indicator */}
-              <TouchableOpacity onPress={handleUpiPress} style={styles.qrContainer}>
+              {/* QR Image Indicator (Static, non-clickable) */}
+              <View style={styles.qrContainer}>
                 <Image
                   source={require('../../assets/upi_qr.jpg')}
                   style={styles.qrImage}
                   resizeMode="contain"
                 />
-                <View style={styles.tapGlow}>
-                  <FontAwesome5 name="bolt" size={12} color="#ffffff" />
-                  <Text style={styles.tapGlowText}>Tap to Open PhonePe / UPI App</Text>
-                </View>
+              </View>
+
+              <TouchableOpacity
+                onPress={handlePaytmPress}
+                style={styles.paytmBtn}
+              >
+                <FontAwesome5 name="wallet" size={14} color="#ffffff" style={{ marginRight: 8 }} />
+                <Text style={styles.paytmBtnText}>Pay via Paytm</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={handleUpiPress}
-                style={styles.phonepeBtn}
+                onPress={handleGenericUpiPress}
+                style={styles.genericUpiBtn}
               >
-                <FontAwesome5 name="wallet" size={14} color="#ffffff" style={{ marginRight: 8 }} />
-                <Text style={styles.phonepeBtnText}>Pay via PhonePe / UPI App</Text>
+                <FontAwesome5 name="mobile-alt" size={14} color="#ffffff" style={{ marginRight: 8 }} />
+                <Text style={styles.genericUpiBtnText}>Pay via Other UPI Apps</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -841,8 +868,8 @@ const styles = StyleSheet.create({
     fontSize: 15,
     fontWeight: '700',
   },
-  phonepeBtn: {
-    backgroundColor: '#5f259f',
+  paytmBtn: {
+    backgroundColor: '#00baf2',
     height: 48,
     borderRadius: 14,
     flexDirection: 'row',
@@ -850,13 +877,35 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginTop: 12,
     marginBottom: 8,
-    shadowColor: '#5f259f',
+    shadowColor: '#00baf2',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 3,
   },
-  phonepeBtnText: {
+  paytmBtnText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  genericUpiBtn: {
+    backgroundColor: '#1e293b',
+    height: 48,
+    borderRadius: 14,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 4,
+    marginBottom: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.08)',
+    shadowColor: '#000000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 2,
+  },
+  genericUpiBtnText: {
     color: '#ffffff',
     fontSize: 14,
     fontWeight: '700',
