@@ -519,7 +519,13 @@ const Buy = () => {
 
                 {/* Bottom Action: Invest Now Button */}
                 <button
-                  onClick={() => handleBuy(pkg)}
+                  onClick={() => {
+                    if (user && user.walletBalance >= pkg.price) {
+                      handleBuy(pkg);
+                    } else {
+                      navigate('/upi', { state: { amount: pkg.price } });
+                    }
+                  }}
                   className="btn-primary prod-invest-now-btn"
                   disabled={purchaseLoading === pkg._id}
                 >

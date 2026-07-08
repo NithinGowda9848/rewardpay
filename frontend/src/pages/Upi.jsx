@@ -332,148 +332,106 @@ const Upi = () => {
 
           {/* Error displays */}
           {formError && <div className="upi-form-error animate-fade-in">{formError}</div>}
-
-          {/* Deposit Layout */}
           {activeTab === 'deposit' && (
             <div className="deposit-layout animate-fade-in">
-              <div className="deposit-grid">
-                
-                {/* Step 1: Scan and Pay */}
-                <div className="deposit-qr-column">
-                  <div className="qr-box-wrapper">
-                    <h4>Scan & Pay</h4>
-                    <p className="qr-subtext">Scan the QR code below or tap to open PhonePe directly.</p>
-                    
-                    <div className="qr-wrapper qr-static-wrapper">
-                      <div 
-                        className="qr-image-container" 
-                        onClick={(e) => handleUpiPayment(e, 'phonepe')}
-                        title="Click to pay via PhonePe"
-                      >
-                        <img src="/upi_qr.jpg" alt="UPI QR Code" className="qr-image static-qr" />
-                        <div className="qr-overlay animate-fade-in">
-                          <span>Pay via PhonePe</span>
-                        </div>
-                      </div>
-                      <span className="qr-amount-indicator">₹{parseFloat(amount) || 0}</span>
-                      
-                      <div className="qr-action-buttons">
-                        <button type="button" onClick={copyQrImage} className="qr-action-btn">
-                          <FaCopy /> {qrCopied ? 'Copied QR' : 'Copy QR'}
-                        </button>
-                        <button type="button" onClick={copyUpiLink} className="qr-action-btn">
-                          <FaCopy /> {linkCopied ? 'Copied Link' : 'Copy UPI Link'}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="merchant-address-box">
-                      <span className="merchant-lbl">Merchant UPI: <strong>kesavaroyal117-1@okicici</strong></span>
-                      <button type="button" onClick={copyUpiAddress} className="copy-btn-mini">
-                        <FaCopy /> {copied ? 'Copied' : 'Copy'}
-                      </button>
-                    </div>
-
-                    <button 
-                      type="button"
-                      onClick={(e) => handleUpiPayment(e, 'phonepe')} 
-                      className="phonepe-pay-btn"
-                    >
-                      Pay via PhonePe / UPI App
+              <div className="deposit-form-column" style={{ width: '100%' }}>
+                <form onSubmit={handleDepositSubmit} className="upi-form">
+                  
+                  {/* Direct Pay UPI Address Box */}
+                  <div className="merchant-address-box" style={{ marginBottom: '10px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px', background: 'rgba(255, 255, 255, 0.03)', border: '1px solid var(--border-glass)', borderRadius: '12px' }}>
+                    <span className="merchant-lbl" style={{ color: 'var(--text-primary)', fontSize: '14px' }}>
+                      Pay to UPI ID: <strong style={{ color: 'var(--color-sky)', fontSize: '16px', marginLeft: '6px' }}>kesavaroyal117-1@okicici</strong>
+                    </span>
+                    <button type="button" onClick={copyUpiAddress} className="copy-btn-mini" style={{ background: 'var(--gradient-main)', border: 'none', padding: '6px 12px', borderRadius: '6px', color: '#fff', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '12px', fontWeight: '600' }}>
+                      <FaCopy /> {copied ? 'Copied' : 'Copy'}
                     </button>
                   </div>
-                </div>
 
-                {/* Step 2: Verification details */}
-                <div className="deposit-form-column">
-                  <form onSubmit={handleDepositSubmit} className="upi-form">
+                  <div className="upi-input-group">
+                    <label htmlFor="amount">Deposit Amount (₹)</label>
+                    <input
+                      id="amount"
+                      type="number"
+                      min="1"
+                      className="input-field"
+                      placeholder="Enter paid amount (e.g. 500)"
+                      value={amount}
+                      onChange={(e) => setAmount(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="upi-input-group">
+                    <label htmlFor="utr">UTR / Transaction ID (12 Digits)</label>
+                    <input
+                      id="utr"
+                      type="text"
+                      maxLength="12"
+                      className="input-field"
+                      placeholder="Enter 12-digit UTR code"
+                      value={utr}
+                      onChange={(e) => setUtr(e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="upi-input-group">
+                    <label>Payment Screenshot</label>
+                    <div className="screenshot-upload-zone">
+                      <input
+                        id="screenshot-input"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileChange}
+                        style={{ display: 'none' }}
+                        required={!screenshot}
+                      />
+                      <label htmlFor="screenshot-input" className="upload-label">
+                        <FaUpload className="upload-icon" />
+                        <span>{screenshot ? 'Change Screenshot' : 'Upload Payment Screenshot'}</span>
+                      </label>
+                    </div>
                     
-                    {/* Permanent Guidelines Box */}
-                    <div className="deposit-guidelines-box animate-fade-in">
-                      <h5>Deposit Guidelines</h5>
-                      <ul>
-                        <li>1. Scan the QR code or copy the UPI ID: <strong>kesavaroyal117-1@okicici</strong>.</li>
-                        <li>2. Use PhonePe or any other UPI app to make the payment.</li>
-                        <li>3. Enter the payment amount and complete the transaction.</li>
-                        <li>4. Copy the <strong>12-digit UTR / Reference ID</strong> from payment receipt.</li>
-                        <li>5. Take a screenshot of the successful payment screen.</li>
-                        <li>6. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
-                      </ul>
-                    </div>
-
-                    <div className="upi-input-group">
-                      <label htmlFor="amount">Deposit Amount (₹)</label>
-                      <input
-                        id="amount"
-                        type="number"
-                        min="1"
-                        className="input-field"
-                        placeholder="Enter paid amount (e.g. 500)"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="upi-input-group">
-                      <label htmlFor="utr">UTR / Transaction ID (12 Digits)</label>
-                      <input
-                        id="utr"
-                        type="text"
-                        maxLength="12"
-                        className="input-field"
-                        placeholder="Enter 12-digit UTR code"
-                        value={utr}
-                        onChange={(e) => setUtr(e.target.value)}
-                        required
-                      />
-                    </div>
-
-                    <div className="upi-input-group">
-                      <label>Payment Screenshot</label>
-                      <div className="screenshot-upload-zone">
-                        <input
-                          id="screenshot-input"
-                          type="file"
-                          accept="image/*"
-                          onChange={handleFileChange}
-                          style={{ display: 'none' }}
-                          required={!screenshot}
-                        />
-                        <label htmlFor="screenshot-input" className="upload-label">
-                          <FaUpload className="upload-icon" />
-                          <span>{screenshot ? 'Change Screenshot' : 'Upload Payment Screenshot'}</span>
-                        </label>
+                    {screenshotPreview && (
+                      <div className="screenshot-preview-container animate-fade-in">
+                        <img src={screenshotPreview} alt="Screenshot Preview" className="screenshot-preview" />
+                        <span className="preview-lbl"><FaImage /> Preview Loaded</span>
                       </div>
-                      
-                      {screenshotPreview && (
-                        <div className="screenshot-preview-container animate-fade-in">
-                          <img src={screenshotPreview} alt="Screenshot Preview" className="screenshot-preview" />
-                          <span className="preview-lbl"><FaImage /> Preview Loaded</span>
-                        </div>
-                      )}
-                    </div>
+                    )}
+                  </div>
 
-                    <div className="submit-action-container">
-                      <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading}>
-                        {txLoading ? <FaSpinner className="spin" /> : 'Submit Deposit'}
-                      </button>
-                      <a 
-                        href="https://t.me/Rewardpayindia"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="help-text-btn-blue"
-                        data-tooltip="Need Help? Click to chat with Support on Telegram."
-                        title="Telegram Support"
-                      >
-                        Deposit Help
-                      </a>
-                    </div>
-                  </form>
-                </div>
+                  <div className="submit-action-container">
+                    <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading}>
+                      {txLoading ? <FaSpinner className="spin" /> : 'Submit Deposit'}
+                    </button>
+                    <a 
+                      href="https://t.me/Rewardpayindia"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="help-text-btn-blue"
+                      data-tooltip="Need Help? Click to chat with Support on Telegram."
+                      title="Telegram Support"
+                    >
+                      Deposit Help
+                    </a>
+                  </div>
+
+                  {/* Permanent Guidelines Box moved to the bottom of the form */}
+                  <div className="deposit-guidelines-box animate-fade-in" style={{ marginTop: '24px' }}>
+                    <h5>Deposit Guidelines</h5>
+                    <ul>
+                      <li>1. Copy the UPI ID: <strong>kesavaroyal117-1@okicici</strong>.</li>
+                      <li>2. Open PhonePe or any other UPI app to make the payment.</li>
+                      <li>3. Enter the payment amount and complete the transaction.</li>
+                      <li>4. Copy the <strong>12-digit UTR / Reference ID</strong> from the payment receipt.</li>
+                      <li>5. Take a screenshot of the successful payment screen.</li>
+                      <li>6. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
+                    </ul>
+                  </div>
+                </form>
               </div>
             </div>
-          )}
+          )}        )}
 
           {/* Withdraw Layout */}
           {/* Withdraw Layout */}
