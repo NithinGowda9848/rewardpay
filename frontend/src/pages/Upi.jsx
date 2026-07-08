@@ -230,40 +230,6 @@ const Upi = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const getUpiUrl = (targetApp) => {
-    switch (targetApp) {
-      case 'paytm':
-        return 'https://paytm.com?utm_source=chatgpt.com';
-      case 'phonepe':
-        return 'https://www.phonepe.com?utm_source=chatgpt.com';
-      case 'gpay':
-        return 'https://pay.google.com?utm_source=chatgpt.com';
-      case 'bhim':
-        return 'https://www.bhimupi.org.in?utm_source=chatgpt.com';
-      case 'amazonpay':
-        return 'https://www.amazon.in/amazonpay?utm_source=chatgpt.com';
-      case 'supermoney':
-        return 'https://super.money?utm_source=chatgpt.com';
-      case 'payzapp':
-        return 'https://www.payzapp.in?utm_source=chatgpt.com';
-      default:
-        return 'https://paytm.com?utm_source=chatgpt.com';
-    }
-  };
-
-  const handleUpiPayment = (e, app) => {
-    e.preventDefault();
-    setFormError('');
-
-    // Copy the UPI ID to clipboard
-    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-
-    const url = getUpiUrl(app);
-    window.location.href = url;
-  };
-
   if (loading) {
     return (
       <div className="page-container">
@@ -322,7 +288,7 @@ const Upi = () => {
                 <div className="deposit-qr-column">
                   <div className="qr-box-wrapper">
                     <h4>UPI Payment</h4>
-                    <p className="qr-subtext">Copy the UPI ID below to pay, or use direct payment apps.</p>
+                    <p className="qr-subtext">Copy the UPI ID below to pay and complete your deposit.</p>
 
                     <div style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Amount to Pay</span>
@@ -338,34 +304,6 @@ const Upi = () => {
                         </button>
                       </div>
                     </div>
-
-                    <div className="direct-pay-apps">
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'paytm')} className="paytm-pay-btn">
-                        <FaMobileAlt /> Touch Paytm
-                      </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
-                        <FaWallet /> Touch PhonePe
-                      </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'gpay')} className="gpay-pay-btn">
-                        <FaGoogle /> Touch Google Pay
-                      </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'bhim')} className="bhim-pay-btn">
-                        <FaMobileAlt /> Touch BHIM
-                      </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'amazonpay')} className="amazon-pay-btn">
-                        <FaMobileAlt /> Touch Amazon Pay
-                      </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'supermoney')} className="supermoney-pay-btn">
-                        <FaMobileAlt /> Touch Super.money
-                      </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'payzapp')} className="payzapp-pay-btn">
-                        <FaMobileAlt /> Touch PayZapp
-                      </button>
-                    </div>
-
-                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '15px', textAlign: 'center', lineHeight: '1.5' }}>
-                      * UPI ID is auto-copied to clipboard. If the app opens to the search page (like in the referral screen), simply paste and proceed.
-                    </p>
                   </div>
                 </div>
 
