@@ -218,9 +218,6 @@ const Upi = () => {
   // copyQrImage removed
 
   const getUpiUrl = (targetApp = 'generic') => {
-    const baseAddress = 'kesavaroyal117-1@okicici';
-    const pn = 'Akula kesava';
-    
     const isAndroid = /Android/i.test(navigator.userAgent);
     
     if (targetApp === 'paytm') {
@@ -247,8 +244,8 @@ const Upi = () => {
       }
     }
 
-    // Generic fallback without amount
-    return `upi://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit`;
+    // Generic fallback to launch UPI app chooser without prefilling UPI ID
+    return `upi://pay`;
   };
 
   const handleUpiPayment = (e, app = 'generic') => {
