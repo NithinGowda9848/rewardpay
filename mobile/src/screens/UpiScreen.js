@@ -62,6 +62,8 @@ export default function UpiScreen({ navigation, route }) {
       upiUrl = 'paytmmp://';
     } else if (targetApp === 'gpay') {
       upiUrl = 'gpay://';
+    } else if (targetApp === 'bhim') {
+      upiUrl = 'bhim://';
     }
 
     try {
@@ -69,10 +71,10 @@ export default function UpiScreen({ navigation, route }) {
       if (supported) {
         await Linking.openURL(upiUrl);
       } else {
-        Alert.alert('Error', 'Selected payment app is not installed on your device.');
+        Alert.alert('App Not Installed', 'Selected payment app is not installed on your device.');
       }
     } catch (err) {
-      Alert.alert('Error', 'Selected payment app is not installed on your device.');
+      Alert.alert('App Not Installed', 'Selected payment app is not installed on your device.');
     }
   };
 
@@ -296,9 +298,9 @@ export default function UpiScreen({ navigation, route }) {
                 <Text style={{ color: '#f8fafc', fontSize: 15, fontWeight: '700' }}>Akula kesava</Text>
               </View>
 
-              <TouchableOpacity onPress={handleUpiPress} style={styles.upiCopyRow}>
+              <View style={styles.upiCopyRow}>
                 <View style={styles.upiLabelCol}>
-                  <Text style={styles.upiLabel}>Official UPI ID (Tap to Pay)</Text>
+                  <Text style={styles.upiLabel}>Official UPI ID</Text>
                   <Text style={styles.upiValue}>{companyUpi}</Text>
                 </View>
                 <TouchableOpacity
@@ -308,7 +310,7 @@ export default function UpiScreen({ navigation, route }) {
                   <FontAwesome5 name={copiedId === 'upi_id' ? 'check' : 'copy'} size={14} color="#818cf8" />
                   <Text style={styles.copyBtnText}>{copiedId === 'upi_id' ? 'Copied' : 'Copy ID'}</Text>
                 </TouchableOpacity>
-              </TouchableOpacity>
+              </View>
 
               <TouchableOpacity
                 onPress={() => handleUpiPress('paytm')}
