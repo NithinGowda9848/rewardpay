@@ -5,7 +5,7 @@ import API from '../services/api';
 import GlassCard from '../components/GlassCard';
 import SuccessModal from '../components/SuccessModal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { FaCalendarAlt, FaCoins, FaCheckCircle, FaExclamationTriangle, FaMobileAlt, FaCopy, FaUpload, FaSpinner, FaImage, FaLink } from 'react-icons/fa';
+import { FaCalendarAlt, FaCoins, FaCheckCircle, FaExclamationTriangle, FaCopy, FaUpload, FaSpinner, FaImage } from 'react-icons/fa';
 import './Buy.css';
 
 const getBackendHost = () => {
@@ -403,32 +403,7 @@ const Buy = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const getUpiUrl = (targetApp = 'generic') => {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    if (targetApp === 'phonepe') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;end`;
-      } else {
-        return `phonepe://`;
-      }
-    }
-    return `upi://pay`;
-  };
 
-  const handleUpiPayment = (e, app = 'generic') => {
-    e.preventDefault();
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (!isMobile) {
-      let webUrl = 'https://www.bhimupi.org.in';
-      if (app === 'phonepe') {
-        webUrl = 'https://phonepe.com';
-      }
-      window.open(webUrl, '_blank');
-      return;
-    }
-    const url = getUpiUrl(app);
-    window.location.href = url;
-  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -723,14 +698,6 @@ const Buy = () => {
                 </div>
               </div>
 
-              <div className="direct-pay-apps">
-                <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
-                  <FaMobileAlt /> Pay via PhonePe
-                </button>
-                <button type="button" onClick={(e) => handleUpiPayment(e, 'generic')} className="generic-upi-pay-btn">
-                  <FaMobileAlt /> Pay via Other UPI Apps
-                </button>
-              </div>
 
               {formError && <div className="upi-form-error animate-fade-in" style={{ marginTop: '10px' }}>{formError}</div>}
 
