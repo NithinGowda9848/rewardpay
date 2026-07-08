@@ -241,7 +241,7 @@ const Upi = () => {
       if (isAndroid) {
         return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=com.phonepe.app;end`;
       } else {
-        return `phonepe://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
+        return `phonepe://upi/pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
       }
     }
 
@@ -262,6 +262,9 @@ const Upi = () => {
       alert("Direct UPI redirection is only supported on mobile devices. Please copy the UPI ID below to pay.");
       return;
     }
+    
+    // Auto-copy the UPI address to clipboard first
+    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
     
     const url = getUpiUrl(app);
     window.location.href = url;
@@ -354,6 +357,9 @@ const Upi = () => {
                         <FaMobileAlt /> Pay via Other UPI Apps
                       </button>
                     </div>
+                    <p className="qr-subtext" style={{ marginTop: '14px', fontSize: '11px', lineHeight: '1.4', color: 'rgba(255, 255, 255, 0.45)', textAlign: 'center' }}>
+                      * UPI ID is auto-copied to clipboard. If the app opens to the search page (like in the referral screen), simply paste and proceed.
+                    </p>
                   </div>
                 </div>
 
