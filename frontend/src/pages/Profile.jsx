@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import GlassCard from '../components/GlassCard';
 import { FaUser, FaEnvelope, FaCalendarAlt, FaWallet, FaCoins, FaSignOutAlt, FaShieldAlt } from 'react-icons/fa';
@@ -6,6 +7,7 @@ import './Profile.css';
 
 const Profile = () => {
   const { user, logout } = useAuth();
+  const navigate = useNavigate();
 
   const getVipLevel = (earnings) => {
     if (earnings >= 1000) return 'VIP 3 Gold';
@@ -97,7 +99,12 @@ const Profile = () => {
               </div>
             </div>
 
-            <div className="profile-btn-row" style={{ marginTop: '30px' }}>
+            <div className="profile-btn-row" style={{ marginTop: '30px', display: 'flex', flexDirection: 'column', gap: '12px' }}>
+              {user && user.role === 'admin' && (
+                <button type="button" onClick={() => navigate('/admin')} className="btn-primary profile-admin-btn" style={{ width: '100%' }}>
+                  <FaShieldAlt /> Open Admin Panel
+                </button>
+              )}
               <button type="button" onClick={logout} className="btn-secondary profile-logout-btn" style={{ width: '100%' }}>
                 <FaSignOutAlt /> Log Out Account
               </button>
