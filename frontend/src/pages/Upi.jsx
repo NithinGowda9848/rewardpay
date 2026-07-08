@@ -54,6 +54,7 @@ const Upi = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalTitle, setModalTitle] = useState('');
   const [modalMsg, setModalMsg] = useState('');
+  const [copied, setCopied] = useState(false);
   const [confirmingId, setConfirmingId] = useState(null);
 
   const fetchTransactions = async () => {
@@ -223,68 +224,44 @@ const Upi = () => {
     }
   };
 
-  const getUpiUrl = (targetApp = 'generic') => {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    const fallbackUrl = encodeURIComponent(window.location.origin + window.location.pathname + `?not_installed=${targetApp}`);
+  const copyUpiAddress = () => {
+    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
-    if (targetApp === 'paytm') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=paytmmp;package=net.one97.paytm;S.browser_fallback_url=${fallbackUrl};end`;
-      } else {
-        return `paytmmp://`;
-      }
-    }
-
-    if (targetApp === 'phonepe') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;S.browser_fallback_url=${fallbackUrl};end`;
-      } else {
-        return `phonepe://`;
-      }
-    }
-
-    // Generic fallback to launch UPI app chooser without prefilling UPI ID
-    if (isAndroid) {
-      const genericFallback = encodeURIComponent(window.location.origin + window.location.pathname + `?not_installed=generic`);
-      return `intent://#Intent;scheme=upi;S.browser_fallback_url=${genericFallback};end`;
-    } else {
-      return `upi://`;
+  const getUpiUrl = (targetApp) => {
+    switch (targetApp) {
+      case 'paytm':
+        return 'https://paytm.com?utm_source=chatgpt.com';
+      case 'phonepe':
+        return 'https://www.phonepe.com?utm_source=chatgpt.com';
+      case 'gpay':
+        return 'https://pay.google.com?utm_source=chatgpt.com';
+      case 'bhim':
+        return 'https://www.bhimupi.org.in?utm_source=chatgpt.com';
+      case 'amazonpay':
+        return 'https://www.amazon.in/amazonpay?utm_source=chatgpt.com';
+      case 'supermoney':
+        return 'https://super.money?utm_source=chatgpt.com';
+      case 'payzapp':
+        return 'https://www.payzapp.in?utm_source=chatgpt.com';
+      default:
+        return 'https://paytm.com?utm_source=chatgpt.com';
     }
   };
 
-  const handleUpiPayment = (e, app = 'generic') => {
+  const handleUpiPayment = (e, app) => {
     e.preventDefault();
     setFormError('');
 
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (!isMobile) {
-      setFormError('Selected payment app is not installed on this device.');
-      return;
-    }
+    // Copy the UPI ID to clipboard
+    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
 
     const url = getUpiUrl(app);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-    if (isIOS) {
-      const start = Date.now();
-      let hasBlurred = false;
-
-      const handleBlur = () => {
-        hasBlurred = true;
-      };
-
-      window.addEventListener('blur', handleBlur);
-      window.location.href = url;
-
-      setTimeout(() => {
-        window.removeEventListener('blur', handleBlur);
-        if (!hasBlurred && (Date.now() - start < 1500)) {
-          setFormError('Selected payment app is not installed on this device.');
-        }
-      }, 1200);
-    } else {
-      window.location.href = url;
-    }
+    window.location.href = url;
   };
 
   if (loading) {
@@ -341,16 +318,25 @@ const Upi = () => {
           {activeTab === 'deposit' && (
             <div className="deposit-layout animate-fade-in">
               <div className="deposit-grid">
-
                 {/* Step 1: Scan and Pay */}
                 <div className="deposit-qr-column">
                   <div className="qr-box-wrapper">
                     <h4>UPI Payment</h4>
-                    <p className="qr-subtext">Select your preferred payment app below to pay.</p>
+                    <p className="qr-subtext">Copy the UPI ID below to pay, or use direct payment apps.</p>
 
                     <div style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Amount to Pay</span>
                       <span style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
+                    </div>
+
+                    <div className="merchant-address-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+                      <span className="merchant-lbl">Merchant Name: <strong style={{ color: '#ffffff' }}>Akula kesava</strong></span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <span className="merchant-lbl">Merchant UPI: <strong>kesavaroyal117-1@okicici</strong></span>
+                        <button type="button" onClick={copyUpiAddress} className="copy-btn-mini">
+                          <FaCopy /> {copied ? 'Copied' : 'Copy'}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="direct-pay-apps">
@@ -358,12 +344,28 @@ const Upi = () => {
                         <FaMobileAlt /> Pay via Paytm
                       </button>
                       <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
-                        <FaMobileAlt /> Pay via PhonePe
+                        <FaWallet /> Pay via PhonePe
                       </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'generic')} className="generic-upi-pay-btn">
-                        <FaMobileAlt /> Pay via Other UPI Apps
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'gpay')} className="gpay-pay-btn">
+                        <FaGoogle /> Pay via Google Pay
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'bhim')} className="bhim-pay-btn">
+                        <FaMobileAlt /> Pay via BHIM
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'amazonpay')} className="amazon-pay-btn">
+                        <FaMobileAlt /> Pay via Amazon Pay
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'supermoney')} className="supermoney-pay-btn">
+                        <FaMobileAlt /> Pay via Super.money
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'payzapp')} className="payzapp-pay-btn">
+                        <FaMobileAlt /> Pay via PayZapp
                       </button>
                     </div>
+
+                    <p style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '15px', textAlign: 'center', lineHeight: '1.5' }}>
+                      * UPI ID is auto-copied to clipboard. If the app opens to the search page (like in the referral screen), simply paste and proceed.
+                    </p>
                   </div>
                 </div>
 
@@ -434,11 +436,12 @@ const Upi = () => {
                     <div className="deposit-guidelines-box animate-fade-in" style={{ marginTop: '20px' }}>
                       <h5>Deposit Guidelines</h5>
                       <ul>
-                        <li>1. Choose Paytm, PhonePe, or Other UPI Apps below to make the payment.</li>
-                        <li>2. Complete the transaction directly in the payment app.</li>
-                        <li>3. Copy the <strong>12-digit UTR / Reference ID</strong> from the payment receipt.</li>
-                        <li>4. Take a screenshot of the successful payment screen.</li>
-                        <li>5. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
+                        <li>1. Copy the UPI ID: <strong>kesavaroyal117-1@okicici</strong>.</li>
+                        <li>2. Use Paytm, PhonePe, or any other UPI app to make the payment.</li>
+                        <li>3. Enter the payment amount and complete the transaction.</li>
+                        <li>4. Copy the <strong>12-digit UTR / Reference ID</strong> from payment receipt.</li>
+                        <li>5. Take a screenshot of the successful payment screen.</li>
+                        <li>6. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
                       </ul>
                       <a
                         href="https://t.me/Rewardpayindia"
