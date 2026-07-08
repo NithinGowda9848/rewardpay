@@ -192,9 +192,9 @@ const Upi = () => {
       const res = await API.post('/wallet/withdraw', payload);
 
       if (res.data.success) {
-        setModalTitle('Withdrawal Successful!');
+        setModalTitle('Withdrawal Requested!');
         const displayTarget = withdrawMethod === 'upi' ? `UPI ID: ${withdrawUpi}` : `Bank A/C: ${accountNumber}`;
-        setModalMsg(`A withdrawal of ₹${wdrAmount.toFixed(2)} has been processed and sent to ${displayTarget}`);
+        setModalMsg(`A withdrawal request of ₹${wdrAmount.toFixed(2)} to ${displayTarget} has been submitted successfully and is pending approval.`);
         setIsModalOpen(true);
         setAmount('');
         setWithdrawUpi('');

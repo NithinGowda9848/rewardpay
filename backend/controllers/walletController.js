@@ -122,13 +122,13 @@ exports.withdraw = async (req, res) => {
       userId: req.user._id,
       amount: wdrAmount,
       type: 'withdraw',
-      status: 'completed', // auto-complete withdrawal for dashboard ease
+      status: 'pending',
       description,
     });
 
     res.status(201).json({
       success: true,
-      message: 'Withdrawal processed successfully!',
+      message: 'Withdrawal request submitted successfully and is pending approval!',
       data: transaction,
     });
   } catch (error) {
