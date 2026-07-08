@@ -56,40 +56,40 @@ export default function UpiScreen({ navigation, route }) {
 
   const handlePaytmPress = async () => {
     const paytmUrl = `paytmmp://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
-    const genericUpiUrl = `upi://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
-    
     try {
       const supported = await Linking.canOpenURL(paytmUrl);
       if (supported) {
         await Linking.openURL(paytmUrl);
       } else {
-        const genericSupported = await Linking.canOpenURL(genericUpiUrl);
-        if (genericSupported) {
-          await Linking.openURL(genericUpiUrl);
+        // Fallback to general UPI url
+        const genericUrl = `upi://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
+        const canOpenGeneric = await Linking.canOpenURL(genericUrl);
+        if (canOpenGeneric) {
+          await Linking.openURL(genericUrl);
         } else {
           await Clipboard.setStringAsync(companyUpi);
-          Alert.alert('UPI ID Copied', 'Paytm or other UPI apps not found. UPI ID has been copied to your clipboard.');
+          Alert.alert('UPI ID Copied', 'No Paytm or UPI apps found on this device. UPI ID has been copied to your clipboard.');
         }
       }
     } catch (err) {
       await Clipboard.setStringAsync(companyUpi);
-      Alert.alert('UPI ID Copied', 'UPI ID copied to clipboard. Paste it in Paytm to complete payment.');
+      Alert.alert('UPI ID Copied', 'UPI ID copied to clipboard. Paste it in your payment app (e.g. Paytm, PhonePe) to complete payment.');
     }
   };
 
-  const handleGenericUpiPress = async () => {
-    const genericUpiUrl = `upi://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
+  const handleUpiPress = async () => {
+    const upiUrl = `upi://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
     try {
-      const supported = await Linking.canOpenURL(genericUpiUrl);
+      const supported = await Linking.canOpenURL(upiUrl);
       if (supported) {
-        await Linking.openURL(genericUpiUrl);
+        await Linking.openURL(upiUrl);
       } else {
         await Clipboard.setStringAsync(companyUpi);
         Alert.alert('UPI ID Copied', 'No direct UPI apps found on this device. UPI ID has been copied to your clipboard.');
       }
     } catch (err) {
       await Clipboard.setStringAsync(companyUpi);
-      Alert.alert('UPI ID Copied', 'UPI ID copied to clipboard.');
+      Alert.alert('UPI ID Copied', 'UPI ID copied to clipboard. Paste it in Paytm, Google Pay, or PhonePe to complete payment.');
     }
   };
 
@@ -322,15 +322,6 @@ export default function UpiScreen({ navigation, route }) {
                 </TouchableOpacity>
               </TouchableOpacity>
 
-              {/* QR Image Indicator (Static, non-clickable) */}
-              <View style={styles.qrContainer}>
-                <Image
-                  source={require('../../assets/upi_qr.jpg')}
-                  style={styles.qrImage}
-                  resizeMode="contain"
-                />
-              </View>
-
               <TouchableOpacity
                 onPress={handlePaytmPress}
                 style={styles.paytmBtn}
@@ -340,7 +331,7 @@ export default function UpiScreen({ navigation, route }) {
               </TouchableOpacity>
 
               <TouchableOpacity
-                onPress={handleGenericUpiPress}
+                onPress={handleUpiPress}
                 style={styles.genericUpiBtn}
               >
                 <FontAwesome5 name="mobile-alt" size={14} color="#ffffff" style={{ marginRight: 8 }} />
@@ -357,7 +348,7 @@ export default function UpiScreen({ navigation, route }) {
 
               {showDepositHelp && (
                 <View style={styles.helpBox}>
-                  <Text style={styles.helpStep}>1. Copy company UPI ID or Scan the QR code.</Text>
+                  <Text style={styles.helpStep}>1. Copy company UPI ID or Tap Pay buttons above.</Text>
                   <Text style={styles.helpStep}>2. Transfer amount (Min: ₹500) using your payment app.</Text>
                   <Text style={styles.helpStep}>3. Copy the 12-digit UTR/UPI Ref No. from the receipt.</Text>
                   <Text style={styles.helpStep}>4. Take a screenshot of the payment success screen.</Text>
@@ -876,7 +867,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 12,
-    marginBottom: 8,
+    marginBottom: 6,
     shadowColor: '#00baf2',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
@@ -895,15 +886,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop: 4,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.08)',
-    shadowColor: '#000000',
+    marginTop: 6,
+    marginBottom: 8,
+    shadowColor: '#1e293b',
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 8,
-    elevation: 2,
+    elevation: 3,
   },
   genericUpiBtnText: {
     color: '#ffffff',
