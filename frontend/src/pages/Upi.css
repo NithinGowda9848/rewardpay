@@ -755,35 +755,6 @@
   margin-top: 15px;
 }
 
-.phonepe-pay-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: #5f259f;
-  /* PhonePe brand color */
-  background: linear-gradient(135deg, #7b2cbf 0%, #5f259f 100%);
-  color: #ffffff !important;
-  border: none;
-  font-family: inherit;
-  cursor: pointer;
-  text-decoration: none;
-  font-size: 13.5px;
-  font-weight: 700;
-  padding: 12px 20px;
-  border-radius: var(--border-radius-md);
-  transition: var(--transition-smooth);
-  width: 100%;
-  text-align: center;
-  box-shadow: 0 4px 12px rgba(95, 37, 159, 0.3);
-}
-
-.phonepe-pay-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(95, 37, 159, 0.5);
-  filter: brightness(1.1);
-}
-
 .paytm-pay-btn {
   display: flex;
   align-items: center;
@@ -810,6 +781,35 @@
 .paytm-pay-btn:hover {
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(0, 186, 242, 0.5);
+  filter: brightness(1.1);
+}
+
+.phonepe-pay-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: #5f259f;
+  /* PhonePe Purple brand color */
+  background: linear-gradient(135deg, #5f259f 0%, #3a116c 100%);
+  color: #ffffff !important;
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
+  text-decoration: none;
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 12px 20px;
+  border-radius: var(--border-radius-md);
+  transition: var(--transition-smooth);
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(95, 37, 159, 0.3);
+}
+
+.phonepe-pay-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(95, 37, 159, 0.5);
   filter: brightness(1.1);
 }
 

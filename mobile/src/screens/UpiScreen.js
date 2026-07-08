@@ -55,7 +55,7 @@ export default function UpiScreen({ navigation, route }) {
   const companyUpi = 'kesavaroyal117-1@okicici';
 
   const handleUpiPress = async () => {
-    const upiUrl = `upi://pay?pa=${companyUpi}&pn=${encodeURIComponent("Akula kesava")}&am=${amount || '0'}&cu=INR`;
+    const upiUrl = `upi://pay?pa=${companyUpi}&pn=${encodeURIComponent('Akula kesava')}&am=${amount || '0'}&cu=INR`;
     try {
       const supported = await Linking.canOpenURL(upiUrl);
       if (supported) {
@@ -285,6 +285,11 @@ export default function UpiScreen({ navigation, route }) {
             <GlassCard>
               <Text style={styles.cardTitle}>Step 1: Pay to Company UPI</Text>
               
+              <View style={{ marginBottom: 12, backgroundColor: 'rgba(255, 255, 255, 0.02)', padding: 16, borderRadius: 14, borderWidth: 1, borderColor: 'rgba(255, 255, 255, 0.08)' }}>
+                <Text style={{ color: '#64748b', fontSize: 11, marginBottom: 4 }}>Merchant Name</Text>
+                <Text style={{ color: '#f8fafc', fontSize: 15, fontWeight: '700' }}>Akula kesava</Text>
+              </View>
+
               <TouchableOpacity onPress={handleUpiPress} style={styles.upiCopyRow}>
                 <View style={styles.upiLabelCol}>
                   <Text style={styles.upiLabel}>Official UPI ID (Tap to Pay)</Text>

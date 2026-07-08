@@ -222,29 +222,36 @@ const Upi = () => {
     const pn = 'Akula kesava';
     const amtValue = amount && parseFloat(amount) > 0 ? parseFloat(amount) : null;
     
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    
     let url = `upi://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit`;
     if (amtValue) {
       url += `&am=${amtValue}`;
     }
     
     if (targetApp === 'paytm') {
-      const isAndroid = /Android/i.test(navigator.userAgent);
       if (isAndroid) {
         return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=net.one97.paytm;end`;
       } else {
         return `paytmmp://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
       }
     }
-    
+
     if (targetApp === 'phonepe') {
-      const isAndroid = /Android/i.test(navigator.userAgent);
       if (isAndroid) {
         return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=com.phonepe.app;end`;
       } else {
         return `phonepe://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
       }
     }
-    
+
+    if (targetApp === 'gpay') {
+      if (isAndroid) {
+        return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=com.google.android.apps.nbu.paisa.user;end`;
+      } else {
+        return `gpay://upi/pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
+      }
+    }
     return url;
   };
 
@@ -326,19 +333,22 @@ const Upi = () => {
                       <span style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
                     </div>
 
-                    <div className="merchant-address-box">
-                      <span className="merchant-lbl">Merchant UPI: <strong>kesavaroyal117-1@okicici</strong></span>
-                      <button type="button" onClick={copyUpiAddress} className="copy-btn-mini">
-                        <FaCopy /> {copied ? 'Copied' : 'Copy'}
-                      </button>
+                    <div className="merchant-address-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+                      <span className="merchant-lbl">Merchant Name: <strong style={{ color: '#ffffff' }}>Akula kesava</strong></span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <span className="merchant-lbl">Merchant UPI: <strong>kesavaroyal117-1@okicici</strong></span>
+                        <button type="button" onClick={copyUpiAddress} className="copy-btn-mini">
+                          <FaCopy /> {copied ? 'Copied' : 'Copy'}
+                        </button>
+                      </div>
                     </div>
 
                     <div className="direct-pay-apps">
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
-                        <FaMobileAlt /> Pay via PhonePe
-                      </button>
                       <button type="button" onClick={(e) => handleUpiPayment(e, 'paytm')} className="paytm-pay-btn">
                         <FaMobileAlt /> Pay via Paytm
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
+                        <FaMobileAlt /> Pay via PhonePe
                       </button>
                       <button type="button" onClick={(e) => handleUpiPayment(e, 'generic')} className="generic-upi-pay-btn">
                         <FaMobileAlt /> Pay via Other UPI Apps
