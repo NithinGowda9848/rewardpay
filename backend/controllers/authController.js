@@ -206,6 +206,7 @@ exports.register = async (req, res) => {
         mobile: user.mobile,
         walletBalance: user.walletBalance,
         referralCode: user.referralCode,
+        role: user.role,
       },
     });
   } catch (error) {
@@ -254,6 +255,7 @@ exports.login = async (req, res) => {
         mobile: updatedUser.mobile,
         walletBalance: updatedUser.walletBalance,
         referralCode: updatedUser.referralCode,
+        role: updatedUser.role,
       },
     });
   } catch (error) {
@@ -401,6 +403,7 @@ exports.googleAuth = async (req, res) => {
         mobile: user.mobile,
         walletBalance: user.walletBalance,
         referralCode: user.referralCode,
+        role: user.role,
       },
     });
   } catch (err) {

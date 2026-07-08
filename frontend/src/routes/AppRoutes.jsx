@@ -10,6 +10,7 @@ import Upi from '../pages/Upi';
 import Team from '../pages/Team';
 import Profile from '../pages/Profile';
 import Support from '../pages/Support';
+import Admin from '../pages/Admin';
 import Login from '../pages/Login/Login';
 import Register from '../pages/Register/Register';
 
@@ -44,6 +45,7 @@ const AppRoutes = () => {
         <Route path="team" element={<Team />} />
         <Route path="profile" element={<Profile />} />
         <Route path="support" element={<Support />} />
+        <Route path="admin" element={<Admin />} />
       </Route>
 
       {/* Catch-all Redirect */}

@@ -121,7 +121,7 @@ export default function BuyScreen({ navigation }) {
           onPress: async () => {
             setPurchaseLoading(id);
             try {
-              const res = await API.post(`/purchase/buy/${id}`);
+              const res = await API.post('/purchase/buy', { packageId: id });
               if (res.data.success) {
                 setModalTitle('Investment Active!');
                 setModalMsg(`Successfully purchased "${name}". Daily earnings of ₹${res.data.data.dailyEarnings} started!`);

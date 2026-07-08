@@ -519,10 +519,11 @@ const Buy = () => {
 
                 {/* Bottom Action: Invest Now Button */}
                 <button
-                  onClick={() => navigate('/upi', { state: { amount: pkg.price } })}
+                  onClick={() => handleBuy(pkg)}
                   className="btn-primary prod-invest-now-btn"
+                  disabled={purchaseLoading === pkg._id}
                 >
-                  Invest Now
+                  {purchaseLoading === pkg._id ? 'Processing...' : 'Invest Now'}
                 </button>
               </GlassCard>
             );

@@ -211,24 +211,6 @@ const Upi = () => {
     }
   };
 
-  const handleConfirmDeposit = async (txId) => {
-    setConfirmingId(txId);
-    try {
-      const res = await API.post(`/wallet/deposit/confirm/${txId}`);
-      if (res.data.success) {
-        setModalTitle('Deposit Credited!');
-        setModalMsg(`Successfully credited ₹${res.data.data.amount.toFixed(2)} to your wallet balance.`);
-        setIsModalOpen(true);
-        await refreshUser();
-        fetchTransactions();
-      }
-    } catch (err) {
-      alert(err.response?.data?.message || 'Deposit verification failed');
-    } finally {
-      setConfirmingId(null);
-    }
-  };
-
   const copyUpiAddress = () => {
     navigator.clipboard.writeText('kesavaroyal117-1@okicici');
     setCopied(true);
@@ -655,15 +637,6 @@ const Upi = () => {
                     </span>
                     <div className="status-container">
                       <span className={`status-pill ${tx.status}`}>{tx.status}</span>
-                      {tx.status === 'pending' && tx.type === 'deposit' && (
-                        <button
-                          onClick={() => handleConfirmDeposit(tx._id)}
-                          className="simulate-approve-btn"
-                          disabled={confirmingId === tx._id}
-                        >
-                          {confirmingId === tx._id ? '...' : 'Verify'}
-                        </button>
-                      )}
                     </div>
                   </div>
                 </div>

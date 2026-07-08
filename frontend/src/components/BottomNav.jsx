@@ -1,6 +1,6 @@
 import React from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
-import { FaHome, FaShoppingCart, FaQrcode, FaUsers, FaUser, FaSignOutAlt, FaHeadset } from 'react-icons/fa';
+import { FaHome, FaShoppingCart, FaQrcode, FaUsers, FaUser, FaSignOutAlt, FaHeadset, FaUserShield } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import './BottomNav.css';
 
@@ -16,6 +16,10 @@ const BottomNav = () => {
     { name: 'Profile', path: '/profile', icon: <FaUser /> },
     { name: 'Support', path: '/support', icon: <FaHeadset /> },
   ];
+
+  if (user && user.role === 'admin') {
+    navItems.push({ name: 'Admin', path: '/admin', icon: <FaUserShield /> });
+  }
 
   return (
     <>

@@ -177,3 +177,59 @@ exports.getBalance = async (req, res) => {
     res.status(500).json({ success: false, message: error.message });
   }
 };
+
+// @desc    Get all pending deposit requests (Admin only)
+// @route   GET /api/wallet/admin/pending-deposits
+// @access  Private/Admin
+exports.getAllPendingDeposits = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({ type: 'deposit', status: 'pending' })
+      .populate('userId', 'username email mobile')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: transactions,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Approve/Confirm a pending deposit (Admin only)
+// @route   POST /api/wallet/admin/confirm-deposit/:id
+// @access  Private/Admin
+exports.adminConfirmDeposit = async (req, res) => {
+  try {
+    const txId = req.params.id;
+    const transaction = await Transaction.findById(txId);
+
+    if (!transaction) {
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+
+    if (transaction.status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Transaction is already processed' });
+    }
+
+    // Approve transaction
+    transaction.status = 'completed';
+    await transaction.save();
+
+    // Update depositor's wallet balance
+    const user = await User.findById(transaction.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'Depositing user not found' });
+    }
+    user.walletBalance = Number((user.walletBalance + transaction.amount).toFixed(2));
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Deposit verified and user wallet credited successfully!',
+      data: transaction,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
