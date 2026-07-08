@@ -5,32 +5,30 @@ import API from '../services/api';
 import GlassCard from '../components/GlassCard';
 import SuccessModal from '../components/SuccessModal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import {
-  FaPlusCircle,
-  FaMinusCircle,
-  FaHistory,
-  FaCopy,
-  FaSpinner,
-  FaUpload,
-  FaQuestionCircle,
+import { 
+  FaPlusCircle, 
+  FaMinusCircle, 
+  FaHistory, 
+  FaCopy, 
+  FaSpinner, 
+  FaUpload, 
+  FaQuestionCircle, 
   FaImage,
   FaMobileAlt,
-  FaDownload,
-  FaWallet,
-  FaGoogle
+  FaDownload
 } from 'react-icons/fa';
 import './Upi.css';
 
 const Upi = () => {
   const { user, refreshUser } = useAuth();
   const location = useLocation();
-
+  
   // Tab control: 'deposit' | 'withdraw'
   const [activeTab, setActiveTab] = useState('deposit');
   const [loading, setLoading] = useState(true);
   const [txLoading, setTxLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
-
+  
   // Form states
   const [amount, setAmount] = useState('');
   const [utr, setUtr] = useState('');
@@ -42,7 +40,7 @@ const Upi = () => {
   const [accountNumber, setAccountNumber] = useState('');
   const [ifscCode, setIfscCode] = useState('');
   const [formError, setFormError] = useState('');
-
+  
   // Help sections
   const [showDepositHelp, setShowDepositHelp] = useState(false);
   const [showWithdrawHelp, setShowWithdrawHelp] = useState(false);
@@ -80,19 +78,6 @@ const Upi = () => {
       setActiveTab('deposit');
     }
   }, [location.state]);
-
-  useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const notInstalled = params.get('not_installed');
-    if (notInstalled) {
-      if (notInstalled === 'any') {
-        setFormError('No UPI applications are available on this device.');
-      } else {
-        setFormError('Selected UPI app is not installed on this device.');
-      }
-      window.history.replaceState({}, document.title, window.location.pathname);
-    }
-  }, [location.search]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -230,6 +215,60 @@ const Upi = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  // copyQrImage removed
+
+  const getUpiUrl = (targetApp = 'generic') => {
+    const baseAddress = 'kesavaroyal117-1@okicici';
+    const pn = 'Akula kesava';
+    
+    const isAndroid = /Android/i.test(navigator.userAgent);
+    
+    if (targetApp === 'paytm') {
+      if (isAndroid) {
+        return `intent://#Intent;scheme=paytmmp;package=net.one97.paytm;end`;
+      } else {
+        return `paytmmp://`;
+      }
+    }
+
+    if (targetApp === 'phonepe') {
+      if (isAndroid) {
+        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;end`;
+      } else {
+        return `phonepe://`;
+      }
+    }
+
+    if (targetApp === 'gpay') {
+      if (isAndroid) {
+        return `intent://#Intent;scheme=gpay;package=com.google.android.apps.nbu.paisa.user;end`;
+      } else {
+        return `gpay://`;
+      }
+    }
+
+    // Generic fallback without amount
+    return `upi://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit`;
+  };
+
+  const handleUpiPayment = (e, app = 'generic') => {
+    e.preventDefault();
+    
+    // Copy the UPI ID to clipboard
+    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+
+    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+    if (!isMobile) {
+      alert("UPI ID 'kesavaroyal117-1@okicici' copied to clipboard! Paste it inside your UPI app to complete payment.");
+      return;
+    }
+    
+    const url = getUpiUrl(app);
+    window.location.href = url;
+  };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -284,12 +323,13 @@ const Upi = () => {
           {activeTab === 'deposit' && (
             <div className="deposit-layout animate-fade-in">
               <div className="deposit-grid">
+                
                 {/* Step 1: Scan and Pay */}
                 <div className="deposit-qr-column">
                   <div className="qr-box-wrapper">
                     <h4>UPI Payment</h4>
-                    <p className="qr-subtext">Copy the UPI ID below to pay and complete your deposit.</p>
-
+                    <p className="qr-subtext">Copy the UPI ID below to pay, or use direct payment apps.</p>
+                    
                     <div style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Amount to Pay</span>
                       <span style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
@@ -304,13 +344,25 @@ const Upi = () => {
                         </button>
                       </div>
                     </div>
+
+                    <div className="direct-pay-apps">
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'paytm')} className="paytm-pay-btn">
+                        <FaMobileAlt /> Pay via Paytm
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
+                        <FaMobileAlt /> Pay via PhonePe
+                      </button>
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'generic')} className="generic-upi-pay-btn">
+                        <FaMobileAlt /> Pay via Other UPI Apps
+                      </button>
+                    </div>
                   </div>
                 </div>
 
                 {/* Step 2: Verification details */}
                 <div className="deposit-form-column">
                   <form onSubmit={handleDepositSubmit} className="upi-form">
-
+                    
                     <div className="upi-input-group">
                       <label htmlFor="amount">Deposit Amount (₹)</label>
                       <input
@@ -355,7 +407,7 @@ const Upi = () => {
                           <span>{screenshot ? 'Change Screenshot' : 'Upload Payment Screenshot'}</span>
                         </label>
                       </div>
-
+                      
                       {screenshotPreview && (
                         <div className="screenshot-preview-container animate-fade-in">
                           <img src={screenshotPreview} alt="Screenshot Preview" className="screenshot-preview" />
@@ -381,7 +433,7 @@ const Upi = () => {
                         <li>5. Take a screenshot of the successful payment screen.</li>
                         <li>6. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
                       </ul>
-                      <a
+                      <a 
                         href="https://t.me/Rewardpayindia"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -506,7 +558,7 @@ const Upi = () => {
                 <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading}>
                   {txLoading ? <FaSpinner className="spin" /> : 'Submit Withdrawal Request'}
                 </button>
-                <a
+                <a 
                   href="https://t.me/Rewardpayindia"
                   target="_blank"
                   rel="noopener noreferrer"
