@@ -53,8 +53,6 @@ const Upi = () => {
   const [modalTitle, setModalTitle] = useState('');
   const [modalMsg, setModalMsg] = useState('');
   const [copied, setCopied] = useState(false);
-  const [qrCopied, setQrCopied] = useState(false);
-  const [linkCopied, setLinkCopied] = useState(false);
   const [confirmingId, setConfirmingId] = useState(null);
 
   const fetchTransactions = async () => {
@@ -217,30 +215,7 @@ const Upi = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const copyQrImage = async () => {
-    try {
-      const response = await fetch('/upi_qr.jpg');
-      const blob = await response.blob();
-      await navigator.clipboard.write([
-        new ClipboardItem({
-          [blob.type]: blob
-        })
-      ]);
-      setQrCopied(true);
-      setTimeout(() => setQrCopied(false), 2000);
-    } catch (err) {
-      console.error('Failed to copy image:', err);
-      // Fallback: download
-      const link = document.createElement('a');
-      link.href = '/upi_qr.jpg';
-      link.download = 'upi_qr.jpg';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setQrCopied(true);
-      setTimeout(() => setQrCopied(false), 2000);
-    }
-  };
+  // copyQrImage removed
 
   const getUpiUrl = (targetApp = 'generic') => {
     const baseAddress = 'kesavaroyal117-1@okicici';
@@ -267,19 +242,12 @@ const Upi = () => {
     e.preventDefault();
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (!isMobile) {
-      alert("Direct UPI redirection is only supported on mobile devices. Please scan the QR code on your mobile phone or copy the UPI ID below to pay.");
+      alert("Direct UPI redirection is only supported on mobile devices. Please copy the UPI ID below to pay.");
       return;
     }
     
     const url = getUpiUrl(app);
     window.location.href = url;
-  };
-
-  const copyUpiLink = () => {
-    const upiUrl = getUpiUrl('generic');
-    navigator.clipboard.writeText(upiUrl);
-    setLinkCopied(true);
-    setTimeout(() => setLinkCopied(false), 2000);
   };
 
   if (loading) {
@@ -340,23 +308,12 @@ const Upi = () => {
                 {/* Step 1: Scan and Pay */}
                 <div className="deposit-qr-column">
                   <div className="qr-box-wrapper">
-                    <h4>Scan & Pay</h4>
-                    <p className="qr-subtext">Scan the QR code below manually or copy the UPI ID to pay.</p>
+                    <h4>UPI Payment</h4>
+                    <p className="qr-subtext">Copy the UPI ID below to pay, or use direct payment apps.</p>
                     
-                    <div className="qr-wrapper qr-static-wrapper">
-                      <div className="qr-image-container static-only">
-                        <img src="/upi_qr.jpg" alt="UPI QR Code" className="qr-image static-qr" />
-                      </div>
-                      <span className="qr-amount-indicator">₹{parseFloat(amount) || 0}</span>
-                      
-                      <div className="qr-action-buttons">
-                        <button type="button" onClick={copyQrImage} className="qr-action-btn">
-                          <FaCopy /> {qrCopied ? 'Copied QR' : 'Copy QR'}
-                        </button>
-                        <button type="button" onClick={copyUpiLink} className="qr-action-btn">
-                          <FaCopy /> {linkCopied ? 'Copied Link' : 'Copy UPI Link'}
-                        </button>
-                      </div>
+                    <div style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Amount to Pay</span>
+                      <span style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
                     </div>
 
                     <div className="merchant-address-box">
