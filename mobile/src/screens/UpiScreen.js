@@ -55,9 +55,9 @@ export default function UpiScreen({ navigation, route }) {
   const companyUpi = 'kesavaroyal117-1@okicici';
 
   const handleUpiPress = async (targetApp = 'generic') => {
-    let upiUrl = 'upi://pay';
+    let upiUrl = 'https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853';
     if (targetApp === 'phonepe') {
-      upiUrl = 'phonepe://';
+      upiUrl = 'https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/';
     } else if (targetApp === 'paytm') {
       upiUrl = 'paytmmp://';
     } else if (targetApp === 'gpay') {
@@ -70,21 +70,21 @@ export default function UpiScreen({ navigation, route }) {
         await Linking.openURL(upiUrl);
       } else {
         // Fallback to website
-        let webUrl = 'https://www.bhimupi.org.in';
+        let webUrl = 'https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853';
         if (targetApp === 'paytm') {
           webUrl = 'https://paytm.com';
         } else if (targetApp === 'phonepe') {
-          webUrl = 'https://www.phonepe.com/';
+          webUrl = 'https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/';
         }
         await Linking.openURL(webUrl);
       }
     } catch (err) {
       // Fallback to website
-      let webUrl = 'https://www.bhimupi.org.in';
+      let webUrl = 'https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853';
       if (targetApp === 'paytm') {
         webUrl = 'https://paytm.com';
       } else if (targetApp === 'phonepe') {
-        webUrl = 'https://www.phonepe.com/';
+        webUrl = 'https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/';
       }
       try {
         await Linking.openURL(webUrl);

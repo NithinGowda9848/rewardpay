@@ -229,11 +229,7 @@ const Upi = () => {
     }
 
     if (targetApp === 'phonepe') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;end`;
-      } else {
-        return `phonepe://`;
-      }
+      return `https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/`;
     }
 
     if (targetApp === 'gpay') {
@@ -244,8 +240,8 @@ const Upi = () => {
       }
     }
 
-    // Generic fallback without amount
-    return `upi://pay`;
+    // Generic fallback
+    return `https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853`;
   };
 
   const handleUpiPayment = (e, app = 'generic') => {
@@ -253,11 +249,11 @@ const Upi = () => {
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (!isMobile) {
-      let webUrl = 'https://www.bhimupi.org.in';
+      let webUrl = 'https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853';
       if (app === 'paytm') {
         webUrl = 'https://paytm.com';
       } else if (app === 'phonepe') {
-        webUrl = 'https://www.phonepe.com/';
+        webUrl = 'https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/';
       }
       window.open(webUrl, '_blank');
       return;
