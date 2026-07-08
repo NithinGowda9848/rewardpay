@@ -55,6 +55,9 @@ export default function UpiScreen({ navigation, route }) {
   const companyUpi = 'kesavaroyal117-1@okicici';
 
   const handleUpiPress = async (targetApp = 'generic') => {
+    // Proactively copy the UPI ID to clipboard
+    await Clipboard.setStringAsync(companyUpi);
+
     let upiUrl = 'upi://pay';
     if (targetApp === 'phonepe') {
       upiUrl = 'phonepe://';
@@ -62,8 +65,6 @@ export default function UpiScreen({ navigation, route }) {
       upiUrl = 'paytmmp://';
     } else if (targetApp === 'gpay') {
       upiUrl = 'gpay://';
-    } else if (targetApp === 'bhim') {
-      upiUrl = 'bhim://';
     }
 
     try {
@@ -71,10 +72,10 @@ export default function UpiScreen({ navigation, route }) {
       if (supported) {
         await Linking.openURL(upiUrl);
       } else {
-        Alert.alert('App Not Installed', 'Selected payment app is not installed on your device.');
+        Alert.alert('UPI ID Copied', 'UPI ID has been copied to your clipboard! Paste it inside your UPI app to pay.');
       }
     } catch (err) {
-      Alert.alert('App Not Installed', 'Selected payment app is not installed on your device.');
+      Alert.alert('UPI ID Copied', 'UPI ID has been copied to your clipboard! Paste it inside your UPI app to pay.');
     }
   };
 
@@ -298,9 +299,9 @@ export default function UpiScreen({ navigation, route }) {
                 <Text style={{ color: '#f8fafc', fontSize: 15, fontWeight: '700' }}>Akula kesava</Text>
               </View>
 
-              <View style={styles.upiCopyRow}>
+              <TouchableOpacity onPress={handleUpiPress} style={styles.upiCopyRow}>
                 <View style={styles.upiLabelCol}>
-                  <Text style={styles.upiLabel}>Official UPI ID</Text>
+                  <Text style={styles.upiLabel}>Official UPI ID (Tap to Pay)</Text>
                   <Text style={styles.upiValue}>{companyUpi}</Text>
                 </View>
                 <TouchableOpacity
@@ -310,7 +311,7 @@ export default function UpiScreen({ navigation, route }) {
                   <FontAwesome5 name={copiedId === 'upi_id' ? 'check' : 'copy'} size={14} color="#818cf8" />
                   <Text style={styles.copyBtnText}>{copiedId === 'upi_id' ? 'Copied' : 'Copy ID'}</Text>
                 </TouchableOpacity>
-              </View>
+              </TouchableOpacity>
 
               <TouchableOpacity
                 onPress={() => handleUpiPress('paytm')}
