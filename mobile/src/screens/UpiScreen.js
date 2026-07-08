@@ -301,7 +301,7 @@ export default function UpiScreen({ navigation, route }) {
 
               <TouchableOpacity onPress={handleUpiPress} style={styles.upiCopyRow}>
                 <View style={styles.upiLabelCol}>
-                  <Text style={styles.upiLabel}>Official UPI ID</Text>
+                  <Text style={styles.upiLabel}>Official UPI ID (Tap to Pay)</Text>
                   <Text style={styles.upiValue}>{companyUpi}</Text>
                 </View>
                 <TouchableOpacity
@@ -318,7 +318,7 @@ export default function UpiScreen({ navigation, route }) {
                 style={styles.paytmBtn}
               >
                 <FontAwesome5 name="mobile-alt" size={14} color="#ffffff" style={{ marginRight: 8 }} />
-                <Text style={styles.paytmBtnText}>Pay via Paytm</Text>
+                <Text style={styles.paytmBtnText}>Touch Paytm</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
@@ -326,7 +326,7 @@ export default function UpiScreen({ navigation, route }) {
                 style={styles.phonepeBtn}
               >
                 <FontAwesome5 name="wallet" size={14} color="#ffffff" style={{ marginRight: 8 }} />
-                <Text style={styles.phonepeBtnText}>Pay via PhonePe</Text>
+                <Text style={styles.phonepeBtnText}>Touch PhonePe</Text>
               </TouchableOpacity>
 
               <TouchableOpacity
