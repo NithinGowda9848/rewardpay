@@ -218,34 +218,20 @@ const Upi = () => {
   // copyQrImage removed
 
   const getUpiUrl = (targetApp = 'generic') => {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    
     if (targetApp === 'paytm') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=paytmmp;package=net.one97.paytm;end`;
-      } else {
-        return `paytmmp://`;
-      }
+      return `paytmmp://`;
     }
 
     if (targetApp === 'phonepe') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;end`;
-      } else {
-        return `phonepe://`;
-      }
+      return `phonepe://`;
     }
 
     if (targetApp === 'gpay') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=gpay;package=com.google.android.apps.nbu.paisa.user;end`;
-      } else {
-        return `gpay://`;
-      }
+      return `gpay://`;
     }
 
-    // Generic fallback to launch UPI app chooser without prefilling UPI ID
-    return `upi://pay`;
+    // Generic fallback to launch UPI app chooser
+    return `upi://`;
   };
 
   const handleUpiPayment = (e, app = 'generic') => {
@@ -255,12 +241,6 @@ const Upi = () => {
     navigator.clipboard.writeText('kesavaroyal117-1@okicici');
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (!isMobile) {
-      alert("UPI ID 'kesavaroyal117-1@okicici' copied to clipboard! Paste it inside your UPI app to complete payment.");
-      return;
-    }
     
     const url = getUpiUrl(app);
     window.location.href = url;

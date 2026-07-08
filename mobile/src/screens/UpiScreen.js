@@ -58,7 +58,7 @@ export default function UpiScreen({ navigation, route }) {
     // Proactively copy the UPI ID to clipboard
     await Clipboard.setStringAsync(companyUpi);
 
-    let upiUrl = 'upi://pay';
+    let upiUrl = 'upi://';
     if (targetApp === 'phonepe') {
       upiUrl = 'phonepe://';
     } else if (targetApp === 'paytm') {
