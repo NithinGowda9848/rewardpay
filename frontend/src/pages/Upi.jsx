@@ -5,14 +5,14 @@ import API from '../services/api';
 import GlassCard from '../components/GlassCard';
 import SuccessModal from '../components/SuccessModal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { 
-  FaPlusCircle, 
-  FaMinusCircle, 
-  FaHistory, 
-  FaCopy, 
-  FaSpinner, 
-  FaUpload, 
-  FaQuestionCircle, 
+import {
+  FaPlusCircle,
+  FaMinusCircle,
+  FaHistory,
+  FaCopy,
+  FaSpinner,
+  FaUpload,
+  FaQuestionCircle,
   FaImage,
   FaMobileAlt,
   FaDownload,
@@ -24,13 +24,13 @@ import './Upi.css';
 const Upi = () => {
   const { user, refreshUser } = useAuth();
   const location = useLocation();
-  
+
   // Tab control: 'deposit' | 'withdraw'
   const [activeTab, setActiveTab] = useState('deposit');
   const [loading, setLoading] = useState(true);
   const [txLoading, setTxLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
-  
+
   // Form states
   const [amount, setAmount] = useState('');
   const [utr, setUtr] = useState('');
@@ -42,7 +42,7 @@ const Upi = () => {
   const [accountNumber, setAccountNumber] = useState('');
   const [ifscCode, setIfscCode] = useState('');
   const [formError, setFormError] = useState('');
-  
+
   // Help sections
   const [showDepositHelp, setShowDepositHelp] = useState(false);
   const [showWithdrawHelp, setShowWithdrawHelp] = useState(false);
@@ -85,11 +85,7 @@ const Upi = () => {
     const params = new URLSearchParams(location.search);
     const notInstalled = params.get('not_installed');
     if (notInstalled) {
-      if (notInstalled === 'any') {
-        setFormError('No UPI applications are available on this device.');
-      } else {
-        setFormError('Selected UPI app is not installed on this device.');
-      }
+      setFormError('Selected payment app is not installed on your device.');
       window.history.replaceState({}, document.title, window.location.pathname);
     }
   }, [location.search]);
@@ -233,108 +229,46 @@ const Upi = () => {
   // copyQrImage removed
 
   const getUpiUrl = (targetApp = 'generic') => {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    const fallbackUrl = encodeURIComponent(window.location.origin + window.location.pathname + `?not_installed=${targetApp}`);
-    
-    if (targetApp === 'paytm') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=paytmmp;package=net.one97.paytm;S.browser_fallback_url=${fallbackUrl};end`;
-      } else {
-        return `paytmmp://`;
-      }
-    }
-
-    if (targetApp === 'phonepe') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=phonepe;package=com.phonepe.app;S.browser_fallback_url=${fallbackUrl};end`;
-      } else {
-        return `phonepe://`;
-      }
-    }
-
-    if (targetApp === 'gpay') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=gpay;package=com.google.android.apps.nbu.paisa.user;S.browser_fallback_url=${fallbackUrl};end`;
-      } else {
-        return `gpay://`;
-      }
-    }
-
-    if (targetApp === 'bhim') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=bhim;package=in.org.npci.upiapp;S.browser_fallback_url=${fallbackUrl};end`;
-      } else {
-        return `bhim://`;
-      }
-    }
-
-    if (targetApp === 'amazonpay') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=amazonpay;package=in.amazon.mShop.android.shopping;S.browser_fallback_url=${fallbackUrl};end`;
-      } else {
-        return `amazonpay://`;
-      }
-    }
-
-    if (targetApp === 'cred') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=cred;package=com.dreamplug.androidapp;S.browser_fallback_url=${fallbackUrl};end`;
-      } else {
-        return `cred://`;
-      }
-    }
-
-    // Generic fallback to launch UPI app chooser without prefilling UPI ID
-    if (isAndroid) {
-      const genericFallback = encodeURIComponent(window.location.origin + window.location.pathname + `?not_installed=any`);
-      return `intent://#Intent;scheme=upi;S.browser_fallback_url=${genericFallback};end`;
-    } else {
-      return `upi://`;
-    }
+    if (targetApp === 'paytm') return 'paytmmp://';
+    if (targetApp === 'phonepe') return 'phonepe://';
+    if (targetApp === 'gpay') return 'gpay://';
+    if (targetApp === 'bhim') return 'bhim://';
+    if (targetApp === 'amazonpay') return 'amazonpay://';
+    if (targetApp === 'cred') return 'cred://';
+    return 'upi://pay';
   };
 
   const handleUpiPayment = (e, app = 'generic') => {
     e.preventDefault();
     setFormError('');
-    
-    // Copy the UPI ID to clipboard
-    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (!isMobile) {
-      alert("UPI ID 'kesavaroyal117-1@okicici' copied to clipboard! Paste it inside your UPI app to complete payment.");
+      setFormError('Selected payment app is not installed on your device.');
       return;
     }
-    
+
     const url = getUpiUrl(app);
-    const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
-    
-    if (isIOS) {
-      const start = Date.now();
-      let hasBlurred = false;
-      
-      const handleBlur = () => {
-        hasBlurred = true;
-      };
-      
-      window.addEventListener('blur', handleBlur);
-      window.location.href = url;
-      
-      setTimeout(() => {
-        window.removeEventListener('blur', handleBlur);
-        if (!hasBlurred && (Date.now() - start < 1500)) {
-          if (app === 'generic') {
-            setFormError('No UPI applications are available on this device.');
-          } else {
-            setFormError('Selected UPI app is not installed on this device.');
-          }
-        }
-      }, 1200);
-    } else {
-      window.location.href = url;
-    }
+    const start = Date.now();
+    let appOpened = false;
+
+    const handleStateChange = () => {
+      appOpened = true;
+    };
+
+    window.addEventListener('blur', handleStateChange);
+    document.addEventListener('visibilitychange', handleStateChange);
+
+    window.location.href = url;
+
+    setTimeout(() => {
+      window.removeEventListener('blur', handleStateChange);
+      document.removeEventListener('visibilitychange', handleStateChange);
+
+      if (!appOpened && (Date.now() - start < 1500)) {
+        setFormError('Selected payment app is not installed on your device.');
+      }
+    }, 1200);
   };
 
   if (loading) {
@@ -391,13 +325,13 @@ const Upi = () => {
           {activeTab === 'deposit' && (
             <div className="deposit-layout animate-fade-in">
               <div className="deposit-grid">
-                
+
                 {/* Step 1: Scan and Pay */}
                 <div className="deposit-qr-column">
                   <div className="qr-box-wrapper">
                     <h4>UPI Payment</h4>
                     <p className="qr-subtext">Copy the UPI ID below to pay, or use direct payment apps.</p>
-                    
+
                     <div style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Amount to Pay</span>
                       <span style={{ fontSize: '28px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
@@ -442,7 +376,7 @@ const Upi = () => {
                 {/* Step 2: Verification details */}
                 <div className="deposit-form-column">
                   <form onSubmit={handleDepositSubmit} className="upi-form">
-                    
+
                     <div className="upi-input-group">
                       <label htmlFor="amount">Deposit Amount (₹)</label>
                       <input
@@ -487,7 +421,7 @@ const Upi = () => {
                           <span>{screenshot ? 'Change Screenshot' : 'Upload Payment Screenshot'}</span>
                         </label>
                       </div>
-                      
+
                       {screenshotPreview && (
                         <div className="screenshot-preview-container animate-fade-in">
                           <img src={screenshotPreview} alt="Screenshot Preview" className="screenshot-preview" />
@@ -513,7 +447,7 @@ const Upi = () => {
                         <li>5. Take a screenshot of the successful payment screen.</li>
                         <li>6. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
                       </ul>
-                      <a 
+                      <a
                         href="https://t.me/Rewardpayindia"
                         target="_blank"
                         rel="noopener noreferrer"
@@ -638,7 +572,7 @@ const Upi = () => {
                 <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading}>
                   {txLoading ? <FaSpinner className="spin" /> : 'Submit Withdrawal Request'}
                 </button>
-                <a 
+                <a
                   href="https://t.me/Rewardpayindia"
                   target="_blank"
                   rel="noopener noreferrer"
