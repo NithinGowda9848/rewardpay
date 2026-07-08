@@ -442,7 +442,7 @@ const Upi = () => {
                         <li>5. Take a screenshot of the successful payment screen.</li>
                         <li>6. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
                       </ul>
-                    </div>            <a 
+                      <a 
                         href="https://t.me/Rewardpayindia"
                         target="_blank"
                         rel="noopener noreferrer"
