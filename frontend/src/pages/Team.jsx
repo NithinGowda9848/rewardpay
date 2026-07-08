@@ -38,14 +38,50 @@ const Team = () => {
   }, []);
 
   const getReferralLink = () => {
-    if (!user) return '';
+    if (!user || !user.referralCode) return '';
     return `${window.location.origin}/register?ref=${user.referralCode}`;
   };
 
   const copyReferralLink = () => {
-    navigator.clipboard.writeText(getReferralLink());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    const link = getReferralLink();
+    if (!link) return;
+
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(link)
+        .then(() => {
+          setCopied(true);
+          setTimeout(() => setCopied(false), 2000);
+        })
+        .catch((err) => {
+          console.error('Failed to copy: ', err);
+          fallbackCopyText(link);
+        });
+    } else {
+      fallbackCopyText(link);
+    }
+  };
+
+  const fallbackCopyText = (text) => {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      const successful = document.execCommand('copy');
+      if (successful) {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      } else {
+        alert('Could not copy link automatically. Please manually copy it from the input box.');
+      }
+    } catch (err) {
+      alert('Could not copy link automatically. Please manually copy it from the input box.');
+    }
+    document.body.removeChild(textArea);
   };
 
   // Calculations for 4-Level MLM structure
@@ -117,7 +153,12 @@ const Team = () => {
         <div className="invite-wrapper-inline">
           <div className="invite-link-input-inline glass-panel">
             <FaLink className="link-icon-svg" />
-            <input type="text" readOnly value={getReferralLink()} />
+            <input 
+              type="text" 
+              readOnly 
+              value={getReferralLink()} 
+              onClick={(e) => e.target.select()} 
+            />
           </div>
           <button onClick={copyReferralLink} className="btn-primary copy-link-btn-inline">
             <FaCopy /> {copied ? 'Copied' : 'Copy Link'}
