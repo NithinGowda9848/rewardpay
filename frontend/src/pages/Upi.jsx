@@ -14,7 +14,6 @@ import {
   FaUpload, 
   FaQuestionCircle, 
   FaImage,
-  FaMobileAlt,
   FaDownload
 } from 'react-icons/fa';
 import './Upi.css';
@@ -217,51 +216,7 @@ const Upi = () => {
 
   // copyQrImage removed
 
-  const getUpiUrl = (targetApp = 'generic') => {
-    const isAndroid = /Android/i.test(navigator.userAgent);
-    
-    if (targetApp === 'paytm') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=paytmmp;package=net.one97.paytm;end`;
-      } else {
-        return `paytmmp://`;
-      }
-    }
 
-    if (targetApp === 'phonepe') {
-      return `https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/`;
-    }
-
-    if (targetApp === 'gpay') {
-      if (isAndroid) {
-        return `intent://#Intent;scheme=gpay;package=com.google.android.apps.nbu.paisa.user;end`;
-      } else {
-        return `gpay://`;
-      }
-    }
-
-    // Generic fallback
-    return `https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853`;
-  };
-
-  const handleUpiPayment = (e, app = 'generic') => {
-    e.preventDefault();
-
-    const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-    if (!isMobile) {
-      let webUrl = 'https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853';
-      if (app === 'paytm') {
-        webUrl = 'https://paytm.com';
-      } else if (app === 'phonepe') {
-        webUrl = 'https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/';
-      }
-      window.open(webUrl, '_blank');
-      return;
-    }
-    
-    const url = getUpiUrl(app);
-    window.location.href = url;
-  };
 
   if (loading) {
     return (
@@ -322,7 +277,7 @@ const Upi = () => {
                 <div className="deposit-qr-column">
                   <div className="qr-box-wrapper">
                     <h4>UPI Payment</h4>
-                    <p className="qr-subtext">Copy the UPI ID below to pay, or use direct payment apps.</p>
+                    <p className="qr-subtext">Copy the UPI ID below to pay using your preferred UPI app.</p>
                     
                     <div style={{ margin: '10px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>Amount to Pay</span>
@@ -337,18 +292,6 @@ const Upi = () => {
                           <FaCopy /> {copied ? 'Copied' : 'Copy'}
                         </button>
                       </div>
-                    </div>
-
-                    <div className="direct-pay-apps">
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'paytm')} className="paytm-pay-btn">
-                        <FaMobileAlt /> Pay via Paytm
-                      </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
-                        <FaMobileAlt /> Pay via PhonePe
-                      </button>
-                      <button type="button" onClick={(e) => handleUpiPayment(e, 'generic')} className="generic-upi-pay-btn">
-                        <FaMobileAlt /> Pay via Other UPI Apps
-                      </button>
                     </div>
                   </div>
                 </div>

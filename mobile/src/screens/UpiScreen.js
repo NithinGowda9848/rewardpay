@@ -54,45 +54,7 @@ export default function UpiScreen({ navigation, route }) {
 
   const companyUpi = 'kesavaroyal117-1@okicici';
 
-  const handleUpiPress = async (targetApp = 'generic') => {
-    let upiUrl = 'https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853';
-    if (targetApp === 'phonepe') {
-      upiUrl = 'https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/';
-    } else if (targetApp === 'paytm') {
-      upiUrl = 'paytmmp://';
-    } else if (targetApp === 'gpay') {
-      upiUrl = 'gpay://';
-    }
 
-    try {
-      const supported = await Linking.canOpenURL(upiUrl);
-      if (supported) {
-        await Linking.openURL(upiUrl);
-      } else {
-        // Fallback to website
-        let webUrl = 'https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853';
-        if (targetApp === 'paytm') {
-          webUrl = 'https://paytm.com';
-        } else if (targetApp === 'phonepe') {
-          webUrl = 'https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/';
-        }
-        await Linking.openURL(webUrl);
-      }
-    } catch (err) {
-      // Fallback to website
-      let webUrl = 'https://payments.google.com/gp/w/u/0/home/paymentmethods?sctid=8695422437423853';
-      if (targetApp === 'paytm') {
-        webUrl = 'https://paytm.com';
-      } else if (targetApp === 'phonepe') {
-        webUrl = 'https://www.phonepe.com/how-to-pay/pay-by-phonepe/android/';
-      }
-      try {
-        await Linking.openURL(webUrl);
-      } catch (innerErr) {
-        Alert.alert('Error', 'Could not open the payment website or app.');
-      }
-    }
-  };
 
   const fetchTransactions = async () => {
     try {
@@ -314,9 +276,9 @@ export default function UpiScreen({ navigation, route }) {
                 <Text style={{ color: '#f8fafc', fontSize: 15, fontWeight: '700' }}>Akula kesava</Text>
               </View>
 
-              <TouchableOpacity onPress={handleUpiPress} style={styles.upiCopyRow}>
+              <View style={styles.upiCopyRow}>
                 <View style={styles.upiLabelCol}>
-                  <Text style={styles.upiLabel}>Official UPI ID (Tap to Pay)</Text>
+                  <Text style={styles.upiLabel}>Official UPI ID</Text>
                   <Text style={styles.upiValue}>{companyUpi}</Text>
                 </View>
                 <TouchableOpacity
@@ -326,23 +288,7 @@ export default function UpiScreen({ navigation, route }) {
                   <FontAwesome5 name={copiedId === 'upi_id' ? 'check' : 'copy'} size={14} color="#818cf8" />
                   <Text style={styles.copyBtnText}>{copiedId === 'upi_id' ? 'Copied' : 'Copy ID'}</Text>
                 </TouchableOpacity>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => handleUpiPress('paytm')}
-                style={styles.paytmBtn}
-              >
-                <FontAwesome5 name="mobile-alt" size={14} color="#ffffff" style={{ marginRight: 8 }} />
-                <Text style={styles.paytmBtnText}>Pay via Paytm</Text>
-              </TouchableOpacity>
-
-              <TouchableOpacity
-                onPress={() => handleUpiPress('phonepe')}
-                style={styles.phonepeBtn}
-              >
-                <FontAwesome5 name="wallet" size={14} color="#ffffff" style={{ marginRight: 8 }} />
-                <Text style={styles.phonepeBtnText}>Pay via PhonePe</Text>
-              </TouchableOpacity>
+              </View>
 
               <TouchableOpacity
                 onPress={() => setShowDepositHelp(!showDepositHelp)}
