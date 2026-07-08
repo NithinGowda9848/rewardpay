@@ -219,7 +219,7 @@ const Upi = () => {
 
   const getUpiUrl = (targetApp = 'generic') => {
     const baseAddress = 'kesavaroyal117-1@okicici';
-    const pn = 'KING DOM';
+    const pn = 'Akula kesava';
     const amtValue = amount && parseFloat(amount) > 0 ? parseFloat(amount) : null;
     
     let url = `upi://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit`;
@@ -235,6 +235,16 @@ const Upi = () => {
         return `paytmmp://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
       }
     }
+    
+    if (targetApp === 'phonepe') {
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      if (isAndroid) {
+        return `intent://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}#Intent;scheme=upi;package=com.phonepe.app;end`;
+      } else {
+        return `phonepe://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit${amtValue ? `&am=${amtValue}` : ''}`;
+      }
+    }
+    
     return url;
   };
 
@@ -324,6 +334,9 @@ const Upi = () => {
                     </div>
 
                     <div className="direct-pay-apps">
+                      <button type="button" onClick={(e) => handleUpiPayment(e, 'phonepe')} className="phonepe-pay-btn">
+                        <FaMobileAlt /> Pay via PhonePe
+                      </button>
                       <button type="button" onClick={(e) => handleUpiPayment(e, 'paytm')} className="paytm-pay-btn">
                         <FaMobileAlt /> Pay via Paytm
                       </button>

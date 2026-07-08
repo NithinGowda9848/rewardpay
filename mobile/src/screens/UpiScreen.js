@@ -55,7 +55,7 @@ export default function UpiScreen({ navigation, route }) {
   const companyUpi = 'kesavaroyal117-1@okicici';
 
   const handleUpiPress = async () => {
-    const upiUrl = `upi://pay?pa=${companyUpi}&pn=RewardPay&am=${amount || '0'}&cu=INR`;
+    const upiUrl = `upi://pay?pa=${companyUpi}&pn=${encodeURIComponent("Akula kesava")}&am=${amount || '0'}&cu=INR`;
     try {
       const supported = await Linking.canOpenURL(upiUrl);
       if (supported) {
