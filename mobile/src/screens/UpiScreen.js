@@ -55,10 +55,7 @@ export default function UpiScreen({ navigation, route }) {
   const companyUpi = 'kesavaroyal117-1@okicici';
 
   const handleUpiPress = async (targetApp = 'generic') => {
-    // Proactively copy the UPI ID to clipboard
-    await Clipboard.setStringAsync(companyUpi);
-
-    let upiUrl = `upi://pay?pa=${companyUpi}&pn=${encodeURIComponent('Akula kesava')}&cu=INR`;
+    let upiUrl = 'upi://pay';
     if (targetApp === 'phonepe') {
       upiUrl = 'phonepe://';
     } else if (targetApp === 'paytm') {
@@ -72,10 +69,28 @@ export default function UpiScreen({ navigation, route }) {
       if (supported) {
         await Linking.openURL(upiUrl);
       } else {
-        Alert.alert('UPI ID Copied', 'UPI ID has been copied to your clipboard! Paste it inside your UPI app to pay.');
+        // Fallback to website
+        let webUrl = 'https://www.bhimupi.org.in';
+        if (targetApp === 'paytm') {
+          webUrl = 'https://paytm.com';
+        } else if (targetApp === 'phonepe') {
+          webUrl = 'https://phonepe.com';
+        }
+        await Linking.openURL(webUrl);
       }
     } catch (err) {
-      Alert.alert('UPI ID Copied', 'UPI ID has been copied to your clipboard! Paste it inside your UPI app to pay.');
+      // Fallback to website
+      let webUrl = 'https://www.bhimupi.org.in';
+      if (targetApp === 'paytm') {
+        webUrl = 'https://paytm.com';
+      } else if (targetApp === 'phonepe') {
+        webUrl = 'https://phonepe.com';
+      }
+      try {
+        await Linking.openURL(webUrl);
+      } catch (innerErr) {
+        Alert.alert('Error', 'Could not open the payment website or app.');
+      }
     }
   };
 
@@ -414,7 +429,7 @@ export default function UpiScreen({ navigation, route }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => Linking.openURL('https://t.me/Rewardpayindia')}
+                  onPress={() => Linking.openURL('https://t.me/rewardpayindia1')}
                   style={styles.helpBtnSecondary}
                 >
                   <FontAwesome5 name="telegram" size={16} color="#38bdf8" />
@@ -556,7 +571,7 @@ export default function UpiScreen({ navigation, route }) {
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                  onPress={() => Linking.openURL('https://t.me/Rewardpayindia')}
+                  onPress={() => Linking.openURL('https://t.me/rewardpayindia1')}
                   style={styles.helpBtnSecondary}
                 >
                   <FontAwesome5 name="telegram" size={16} color="#38bdf8" />

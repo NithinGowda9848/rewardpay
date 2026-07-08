@@ -218,9 +218,6 @@ const Upi = () => {
   // copyQrImage removed
 
   const getUpiUrl = (targetApp = 'generic') => {
-    const baseAddress = 'kesavaroyal117-1@okicici';
-    const pn = 'Akula kesava';
-    
     const isAndroid = /Android/i.test(navigator.userAgent);
     
     if (targetApp === 'paytm') {
@@ -248,20 +245,21 @@ const Upi = () => {
     }
 
     // Generic fallback without amount
-    return `upi://pay?pa=${baseAddress}&pn=${encodeURIComponent(pn)}&cu=INR&tn=Deposit`;
+    return `upi://pay`;
   };
 
   const handleUpiPayment = (e, app = 'generic') => {
     e.preventDefault();
-    
-    // Copy the UPI ID to clipboard
-    navigator.clipboard.writeText('kesavaroyal117-1@okicici');
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
 
     const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
     if (!isMobile) {
-      alert("UPI ID 'kesavaroyal117-1@okicici' copied to clipboard! Paste it inside your UPI app to complete payment.");
+      let webUrl = 'https://www.bhimupi.org.in';
+      if (app === 'paytm') {
+        webUrl = 'https://paytm.com';
+      } else if (app === 'phonepe') {
+        webUrl = 'https://phonepe.com';
+      }
+      window.open(webUrl, '_blank');
       return;
     }
     
@@ -434,7 +432,7 @@ const Upi = () => {
                         <li>6. Fill in the amount, paste the UTR, upload the screenshot, and click Submit.</li>
                       </ul>
                       <a 
-                        href="https://t.me/Rewardpayindia"
+                        href="https://t.me/rewardpayindia1"
                         target="_blank"
                         rel="noopener noreferrer"
                         className="help-text-btn-blue"
@@ -559,7 +557,7 @@ const Upi = () => {
                   {txLoading ? <FaSpinner className="spin" /> : 'Submit Withdrawal Request'}
                 </button>
                 <a 
-                  href="https://t.me/Rewardpayindia"
+                  href="https://t.me/rewardpayindia1"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="help-text-btn-blue"

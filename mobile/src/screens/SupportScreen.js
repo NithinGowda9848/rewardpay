@@ -68,7 +68,7 @@ export default function SupportScreen({ navigation }) {
                 Chat with our official Telegram help bot to get instant resolutions and payment support.
               </Text>
               <TouchableOpacity
-                onPress={() => openLink('https://t.me/Rewardpayindia')}
+                onPress={() => openLink('https://t.me/rewardpayindia1')}
                 style={[styles.linkBtn, { backgroundColor: '#0ea5e9' }]}
               >
                 <Text style={styles.linkBtnText}>Message Help Bot</Text>

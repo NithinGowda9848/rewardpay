@@ -212,15 +212,11 @@ const Login = () => {
             {/* Forgot Password Link */}
             <div style={{ textAlign: 'right', marginTop: -10, marginBottom: 18 }}>
               <a
-                href="#"
+                href="https://t.me/rewardpayindia1"
+                target="_blank"
+                rel="noopener noreferrer"
                 className={styles.link}
                 style={{ fontSize: 13 }}
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsForgotMode(true);
-                  setError('');
-                  setResetSuccess('');
-                }}
               >
                 Forgot Password?
               </a>
@@ -240,7 +236,7 @@ const Login = () => {
           <div style={{ marginTop: 4 }}>
             Need help?
             <a
-              href="https://t.me/Rewardpayindia"
+              href="https://t.me/rewardpayindia1"
               target="_blank"
               rel="noopener noreferrer"
               className={styles.link}

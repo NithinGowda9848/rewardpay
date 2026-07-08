@@ -54,7 +54,7 @@ const Support = () => {
                 <h3>Telegram Help Bot</h3>
                 <p>Chat with our official Telegram help bot to get instant resolutions and payment support.</p>
                 <a 
-                  href="https://t.me/Rewardpayindia" 
+                  href="https://t.me/rewardpayindia1" 
                   target="_blank" 
                   rel="noopener noreferrer" 
                   className="channel-link-btn tg-btn"

@@ -161,7 +161,7 @@ export default function LoginScreen({ navigation }) {
                 </View>
 
                 <TouchableOpacity
-                  onPress={() => Linking.openURL('https://t.me/Rewardpayindia')}
+                  onPress={() => Linking.openURL('https://t.me/rewardpayindia1')}
                   style={styles.forgotBtn}
                 >
                   <Text style={styles.forgotText}>Forgot Password?</Text>
