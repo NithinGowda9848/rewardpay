@@ -19,8 +19,8 @@ const TransactionSchema = new mongoose.Schema(
     status: {
       type: String,
       required: true,
-      enum: ['pending', 'completed', 'failed'],
-      default: 'pending',
+      enum: ['pending', 'completed', 'failed', 'Pending', 'Approved', 'Rejected', 'Paid'],
+      default: 'Pending',
     },
     description: {
       type: String,
@@ -33,6 +33,20 @@ const TransactionSchema = new mongoose.Schema(
     screenshot: {
       type: String,
       trim: true,
+    },
+    paymentTime: {
+      type: String,
+      trim: true,
+    },
+    adminRemark: {
+      type: String,
+      trim: true,
+    },
+    bankDetails: {
+      bankName: { type: String, trim: true },
+      bankUserName: { type: String, trim: true },
+      accountNumber: { type: String, trim: true },
+      ifscCode: { type: String, trim: true },
     },
   },
   {

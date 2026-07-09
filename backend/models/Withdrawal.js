@@ -13,13 +13,33 @@ const withdrawalSchema = new mongoose.Schema({
   },
   upiId: {
     type: String,
-    required: true,
+    required: false,
+    trim: true
+  },
+  bankName: {
+    type: String,
+    trim: true
+  },
+  bankUserName: {
+    type: String,
+    trim: true
+  },
+  accountNumber: {
+    type: String,
+    trim: true
+  },
+  ifscCode: {
+    type: String,
     trim: true
   },
   status: {
     type: String,
-    enum: ['Pending', 'Approved', 'Rejected'],
+    enum: ['Pending', 'Approved', 'Rejected', 'Paid'],
     default: 'Pending'
+  },
+  adminRemark: {
+    type: String,
+    trim: true
   },
   requestDate: {
     type: Date,

@@ -9,7 +9,7 @@ const { collectEarnings } = require('./authController');
 // @access  Private
 exports.deposit = async (req, res) => {
   try {
-    const { amount, utr, screenshot } = req.body;
+    const { amount, utr, screenshot, paymentTime } = req.body;
 
     if (!amount || amount <= 0) {
       return res.status(400).json({ success: false, message: 'Please provide a valid amount' });
@@ -24,10 +24,11 @@ exports.deposit = async (req, res) => {
       userId: req.user._id,
       amount,
       type: 'deposit',
-      status: 'pending',
+      status: 'Pending',
       description: `Deposit via UPI (UTR: ${utr})`,
       utr,
       screenshot,
+      paymentTime,
     });
 
     // Also create a Deposit document in deposits collection for the Admin panel to read
@@ -38,6 +39,7 @@ exports.deposit = async (req, res) => {
         utrNumber: utr,
         screenshot: screenshot,
         status: 'Pending',
+        paymentTime,
         date: new Date()
       });
     } catch (dbErr) {
@@ -46,7 +48,7 @@ exports.deposit = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Deposit request created. Please scan QR or pay to UPI ID.',
+      message: 'Deposit Request Submitted Successfully.',
       data: transaction,
     });
   } catch (error) {
@@ -66,12 +68,12 @@ exports.confirmDeposit = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Transaction not found' });
     }
 
-    if (transaction.status !== 'pending') {
+    if (transaction.status !== 'Pending' && transaction.status !== 'pending') {
       return res.status(400).json({ success: false, message: 'Transaction is already processed' });
     }
 
     // Approve transaction
-    transaction.status = 'completed';
+    transaction.status = 'Approved';
     await transaction.save();
 
     // Update user balance
@@ -96,7 +98,7 @@ exports.withdraw = async (req, res) => {
   try {
     const { amount, paymentMethod } = req.body;
     const upiId = req.body.upiId || req.body.upi;
-    const { bankUserName, accountNumber, ifscCode } = req.body;
+    const { bankName, bankUserName, accountNumber, ifscCode } = req.body;
 
     const wdrAmount = parseFloat(amount);
     if (isNaN(wdrAmount) || wdrAmount < 300) {
@@ -113,10 +115,10 @@ exports.withdraw = async (req, res) => {
       }
       description = `Withdrawal to UPI: ${upiId}`;
     } else if (method === 'bank') {
-      if (!bankUserName || !accountNumber || !ifscCode) {
-        return res.status(400).json({ success: false, message: 'Please provide bank account name, account number, and IFSC code' });
+      if (!bankName || !bankUserName || !accountNumber || !ifscCode) {
+        return res.status(400).json({ success: false, message: 'Please provide all bank details (bank name, holder name, account number, and IFSC)' });
       }
-      description = `Withdrawal to Bank: Name: ${bankUserName}, A/C: ${accountNumber}, IFSC: ${ifscCode}`;
+      description = `Withdrawal to Bank: ${bankName} - Name: ${bankUserName}, A/C: ${accountNumber}, IFSC: ${ifscCode}`;
     } else {
       return res.status(400).json({ success: false, message: 'Please provide target payout details (UPI ID or Bank Details)' });
     }
@@ -129,13 +131,14 @@ exports.withdraw = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Insufficient balance' });
     }
 
-    // Create a transaction
+    // Create a transaction (Status is Pending, balance NOT deducted yet per instructions)
     const transaction = await Transaction.create({
       userId: req.user._id,
       amount: wdrAmount,
       type: 'withdraw',
-      status: 'pending',
+      status: 'Pending',
       description,
+      bankDetails: method === 'bank' ? { bankName, bankUserName, accountNumber, ifscCode } : undefined,
     });
 
     // Also create a Withdrawal document in withdrawals collection for the Admin panel to read
@@ -143,7 +146,11 @@ exports.withdraw = async (req, res) => {
       await Withdrawal.create({
         user: req.user._id,
         amount: Number(wdrAmount),
-        upiId: upiId || description,
+        upiId: method === 'upi' ? upiId : undefined,
+        bankName: method === 'bank' ? bankName : undefined,
+        bankUserName: method === 'bank' ? bankUserName : undefined,
+        accountNumber: method === 'bank' ? accountNumber : undefined,
+        ifscCode: method === 'bank' ? ifscCode : undefined,
         status: 'Pending',
         requestDate: new Date()
       });
@@ -203,12 +210,30 @@ exports.getBalance = async (req, res) => {
   }
 };
 
+// @desc    Get all pending transaction requests (Admin only)
+// @route   GET /api/wallet/admin/pending
+// @access  Private/Admin
+exports.adminGetAllPending = async (req, res) => {
+  try {
+    const transactions = await Transaction.find({ status: { $in: ['Pending', 'pending'] } })
+      .populate('userId', 'username email mobile name')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: transactions,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
 // @desc    Get all pending deposit requests (Admin only)
 // @route   GET /api/wallet/admin/pending-deposits
 // @access  Private/Admin
 exports.getAllPendingDeposits = async (req, res) => {
   try {
-    const transactions = await Transaction.find({ type: 'deposit', status: 'pending' })
+    const transactions = await Transaction.find({ type: 'deposit', status: { $in: ['Pending', 'pending'] } })
       .populate('userId', 'username email mobile')
       .sort({ createdAt: -1 });
 
@@ -227,18 +252,20 @@ exports.getAllPendingDeposits = async (req, res) => {
 exports.adminConfirmDeposit = async (req, res) => {
   try {
     const txId = req.params.id;
+    const { adminRemark } = req.body;
     const transaction = await Transaction.findById(txId);
 
     if (!transaction) {
       return res.status(404).json({ success: false, message: 'Transaction not found' });
     }
 
-    if (transaction.status !== 'pending') {
+    if (transaction.status !== 'Pending' && transaction.status !== 'pending') {
       return res.status(400).json({ success: false, message: 'Transaction is already processed' });
     }
 
     // Approve transaction
-    transaction.status = 'completed';
+    transaction.status = 'Approved';
+    transaction.adminRemark = adminRemark || 'Approved by Admin';
     await transaction.save();
 
     // Update depositor's wallet balance
@@ -249,9 +276,158 @@ exports.adminConfirmDeposit = async (req, res) => {
     user.walletBalance = Number((user.walletBalance + transaction.amount).toFixed(2));
     await user.save();
 
+    // Update synchronized Deposit document
+    try {
+      await Deposit.findOneAndUpdate(
+        { utrNumber: transaction.utr },
+        { status: 'Approved', adminRemark: adminRemark || 'Approved by Admin' }
+      );
+    } catch (dbErr) {
+      console.error('Failed to update Deposit document:', dbErr);
+    }
+
     res.status(200).json({
       success: true,
       message: 'Deposit verified and user wallet credited successfully!',
+      data: transaction,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Reject a pending deposit (Admin only)
+// @route   POST /api/wallet/admin/reject-deposit/:id
+// @access  Private/Admin
+exports.adminRejectDeposit = async (req, res) => {
+  try {
+    const txId = req.params.id;
+    const { adminRemark } = req.body;
+    const transaction = await Transaction.findById(txId);
+
+    if (!transaction) {
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+
+    if (transaction.status !== 'Pending' && transaction.status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Transaction is already processed' });
+    }
+
+    // Reject transaction
+    transaction.status = 'Rejected';
+    transaction.adminRemark = adminRemark || 'Rejected by Admin';
+    await transaction.save();
+
+    // Update synchronized Deposit document
+    try {
+      await Deposit.findOneAndUpdate(
+        { utrNumber: transaction.utr },
+        { status: 'Rejected', adminRemark: adminRemark || 'Rejected by Admin' }
+      );
+    } catch (dbErr) {
+      console.error('Failed to update Deposit document:', dbErr);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Deposit request rejected successfully!',
+      data: transaction,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Approve/Pay a pending withdrawal (Admin only)
+// @route   POST /api/wallet/admin/confirm-withdrawal/:id
+// @access  Private/Admin
+exports.adminConfirmWithdrawal = async (req, res) => {
+  try {
+    const txId = req.params.id;
+    const { adminRemark } = req.body;
+    const transaction = await Transaction.findById(txId);
+
+    if (!transaction) {
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+
+    if (transaction.status !== 'Pending' && transaction.status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Transaction is already processed' });
+    }
+
+    // Deduct amount from wallet balance
+    const user = await User.findById(transaction.userId);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.walletBalance < transaction.amount) {
+      return res.status(400).json({ success: false, message: 'User has insufficient balance to complete this withdrawal' });
+    }
+
+    user.walletBalance = Number((user.walletBalance - transaction.amount).toFixed(2));
+    await user.save();
+
+    // Approve transaction
+    transaction.status = 'Paid';
+    transaction.adminRemark = adminRemark || 'Approved and Paid';
+    await transaction.save();
+
+    // Update synchronized Withdrawal document
+    try {
+      await Withdrawal.findOneAndUpdate(
+        { user: transaction.userId, amount: transaction.amount, status: 'Pending' },
+        { status: 'Paid', adminRemark: adminRemark || 'Approved and Paid' }
+      );
+    } catch (dbErr) {
+      console.error('Failed to update Withdrawal document:', dbErr);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Withdrawal approved and balance deducted!',
+      data: transaction,
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+// @desc    Reject a pending withdrawal (Admin only)
+// @route   POST /api/wallet/admin/reject-withdrawal/:id
+// @access  Private/Admin
+exports.adminRejectWithdrawal = async (req, res) => {
+  try {
+    const txId = req.params.id;
+    const { adminRemark } = req.body;
+    const transaction = await Transaction.findById(txId);
+
+    if (!transaction) {
+      return res.status(404).json({ success: false, message: 'Transaction not found' });
+    }
+
+    if (transaction.status !== 'Pending' && transaction.status !== 'pending') {
+      return res.status(400).json({ success: false, message: 'Transaction is already processed' });
+    }
+
+    // Reject transaction
+    transaction.status = 'Rejected';
+    transaction.adminRemark = adminRemark || 'Rejected by Admin';
+    await transaction.save();
+
+    // Update synchronized Withdrawal document
+    try {
+      await Withdrawal.findOneAndUpdate(
+        { user: transaction.userId, amount: transaction.amount, status: 'Pending' },
+        { status: 'Rejected', adminRemark: adminRemark || 'Rejected by Admin' }
+      );
+    } catch (dbErr) {
+      console.error('Failed to update Withdrawal document:', dbErr);
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Withdrawal request rejected successfully!',
       data: transaction,
     });
   } catch (error) {

@@ -25,6 +25,14 @@ const depositSchema = new mongoose.Schema({
     enum: ['Pending', 'Approved', 'Rejected'],
     default: 'Pending'
   },
+  paymentTime: {
+    type: String,
+    trim: true
+  },
+  adminRemark: {
+    type: String,
+    trim: true
+  },
   date: {
     type: Date,
     default: Date.now
