@@ -4,6 +4,7 @@ const { getDashboardStats, getSystemLogs } = require('../controllers/adminDashbo
 const { protect } = require('../middleware/adminAuth');
 
 router.get('/', protect, getDashboardStats);
+router.get('/stats', protect, getDashboardStats);
 router.get('/logs', protect, getSystemLogs);
 
 module.exports = router;

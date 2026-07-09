@@ -63,6 +63,9 @@ app.use('/api/wallet', walletRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/purchase', purchaseRoutes);
 
+app.post('/api/deposits', protect, deposit);
+app.post('/api/withdrawals', protect, withdraw);
+
 // Admin route mounts
 app.use('/api/dashboard', adminDashboardRoutes);
 app.use('/api/users', adminUserRoutes);
@@ -71,9 +74,6 @@ app.use('/api/deposits', adminDepositRoutes);
 app.use('/api/admin/withdrawals', adminWithdrawalRoutes);
 app.use('/api/withdrawals', adminWithdrawalRoutes);
 app.use('/api/settings', adminSettingsRoutes);
-
-app.post('/api/deposits', protect, deposit);
-app.post('/api/withdrawals', protect, withdraw);
 
 // Base route for checkups
 app.get('/', (req, res) => {
