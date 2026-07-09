@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const DepositSchema = new mongoose.Schema({
+const depositSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -33,4 +33,4 @@ const DepositSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Deposit', DepositSchema);
+module.exports = mongoose.model('Deposit', depositSchema);

@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const WithdrawalSchema = new mongoose.Schema({
+const withdrawalSchema = new mongoose.Schema({
   user: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
@@ -29,4 +29,4 @@ const WithdrawalSchema = new mongoose.Schema({
   timestamps: true
 });
 
-module.exports = mongoose.model('Withdrawal', WithdrawalSchema);
+module.exports = mongoose.model('Withdrawal', withdrawalSchema);
