@@ -123,7 +123,12 @@ exports.register = async (req, res) => {
     // Process referral if provided
     let referredByUser = null;
     if (referralCode) {
-      referredByUser = await User.findOne({ referralCode: referralCode.trim() });
+      referredByUser = await User.findOne({
+        $or: [
+          { referralCode: referralCode.trim() },
+          { referralCode: referralCode.trim().toLowerCase() }
+        ]
+      });
       if (!referredByUser) {
         return res.status(400).json({ success: false, message: 'Invalid referral code' });
       }
@@ -338,7 +343,12 @@ exports.googleAuth = async (req, res) => {
 
       let referredByUser = null;
       if (referralCode) {
-        referredByUser = await User.findOne({ referralCode: referralCode.trim() });
+        referredByUser = await User.findOne({
+          $or: [
+            { referralCode: referralCode.trim() },
+            { referralCode: referralCode.trim().toLowerCase() }
+          ]
+        });
       }
 
       const welcomeBonus = 50.0;

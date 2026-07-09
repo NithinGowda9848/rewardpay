@@ -28,6 +28,23 @@ exports.deposit = async (req, res) => {
       screenshot,
     });
 
+    // Also create a Deposit document in deposits collection for the Admin panel to read
+    try {
+      const mongoose = require('mongoose');
+      await mongoose.connection.db.collection('deposits').insertOne({
+        user: req.user._id,
+        amount: Number(amount),
+        utrNumber: utr,
+        screenshot: screenshot,
+        status: 'Pending',
+        date: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    } catch (dbErr) {
+      console.error('Failed to sync deposit to admin DB:', dbErr);
+    }
+
     res.status(201).json({
       success: true,
       message: 'Deposit request created. Please scan QR or pay to UPI ID.',
@@ -125,6 +142,22 @@ exports.withdraw = async (req, res) => {
       status: 'pending',
       description,
     });
+
+    // Also create a Withdrawal document in withdrawals collection for the Admin panel to read
+    try {
+      const mongoose = require('mongoose');
+      await mongoose.connection.db.collection('withdrawals').insertOne({
+        user: req.user._id,
+        amount: Number(wdrAmount),
+        upiId: upiId || description,
+        status: 'Pending',
+        requestDate: new Date(),
+        createdAt: new Date(),
+        updatedAt: new Date()
+      });
+    } catch (dbErr) {
+      console.error('Failed to sync withdrawal to admin DB:', dbErr);
+    }
 
     res.status(201).json({
       success: true,

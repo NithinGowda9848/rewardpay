@@ -42,6 +42,10 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Serve static plan images locally from backend directory
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
 
+// Serve static files from the React frontend app
+const frontendDistPath = path.join(__dirname, '../frontend/dist');
+app.use(express.static(frontendDistPath));
+
 // Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
@@ -52,6 +56,18 @@ app.use('/api/purchase', purchaseRoutes);
 // Base route for checkups
 app.get('/', (req, res) => {
   res.json({ message: 'Earning Rewards Dashboard API running successfully' });
+});
+
+// Catch-all route to serve React's index.html for any client-side routes
+app.get('*', (req, res, next) => {
+  if (req.method === 'GET' && !req.path.startsWith('/api') && !req.path.startsWith('/images')) {
+    return res.sendFile(path.join(frontendDistPath, 'index.html'), (err) => {
+      if (err) {
+        next();
+      }
+    });
+  }
+  next();
 });
 
 // Seed packages if database is empty
