@@ -6,6 +6,14 @@ const withdrawalSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  username: {
+    type: String,
+    trim: true
+  },
   amount: {
     type: Number,
     required: true,
@@ -29,6 +37,14 @@ const withdrawalSchema = new mongoose.Schema({
     trim: true
   },
   ifscCode: {
+    type: String,
+    trim: true
+  },
+  withdrawMethod: {
+    type: String,
+    trim: true
+  },
+  'UPI ID or Bank Details': {
     type: String,
     trim: true
   },

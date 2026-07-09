@@ -147,7 +147,7 @@ const Upi = () => {
 
     setTxLoading(true);
     try {
-      const res = await API.post('/wallet/deposit', {
+      const res = await API.post('/deposits', {
         amount: depAmount,
         utr,
         screenshot,
@@ -212,7 +212,7 @@ const Upi = () => {
 
     setTxLoading(true);
     try {
-      const res = await API.post('/wallet/withdraw', payload);
+      const res = await API.post('/withdrawals', payload);
 
       if (res.data.success) {
         setModalTitle('Withdrawal Requested!');

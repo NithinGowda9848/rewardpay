@@ -35,8 +35,12 @@ exports.deposit = async (req, res) => {
     try {
       await Deposit.create({
         user: req.user._id,
+        userId: req.user._id,
+        username: req.user.username,
         amount: Number(amount),
         utrNumber: utr,
+        'UTR Number': utr,
+        paymentMethod: 'UPI',
         screenshot: screenshot,
         status: 'Pending',
         paymentTime,
@@ -48,7 +52,7 @@ exports.deposit = async (req, res) => {
 
     res.status(201).json({
       success: true,
-      message: 'Deposit Request Submitted Successfully.',
+      message: 'Deposit Request Submitted Successfully',
       data: transaction,
     });
   } catch (error) {
@@ -145,12 +149,16 @@ exports.withdraw = async (req, res) => {
     try {
       await Withdrawal.create({
         user: req.user._id,
+        userId: req.user._id,
+        username: req.user.username,
         amount: Number(wdrAmount),
         upiId: method === 'upi' ? upiId : undefined,
         bankName: method === 'bank' ? bankName : undefined,
         bankUserName: method === 'bank' ? bankUserName : undefined,
         accountNumber: method === 'bank' ? accountNumber : undefined,
         ifscCode: method === 'bank' ? ifscCode : undefined,
+        withdrawMethod: method,
+        'UPI ID or Bank Details': method === 'upi' ? upiId : `Bank Name: ${bankName}, Holder: ${bankUserName}, A/C: ${accountNumber}, IFSC: ${ifscCode}`,
         status: 'Pending',
         requestDate: new Date()
       });

@@ -6,6 +6,14 @@ const depositSchema = new mongoose.Schema({
     ref: 'User',
     required: true
   },
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  username: {
+    type: String,
+    trim: true
+  },
   amount: {
     type: Number,
     required: true,
@@ -15,6 +23,14 @@ const depositSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true
+  },
+  'UTR Number': {
+    type: String,
+    trim: true
+  },
+  paymentMethod: {
+    type: String,
+    default: 'UPI'
   },
   screenshot: {
     type: String,
