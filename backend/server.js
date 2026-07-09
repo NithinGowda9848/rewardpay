@@ -15,6 +15,13 @@ const walletRoutes = require('./routes/walletRoutes');
 const teamRoutes = require('./routes/teamRoutes');
 const purchaseRoutes = require('./routes/purchaseRoutes');
 
+// Import Admin routes
+const adminDashboardRoutes = require('./routes/adminDashboardRoutes');
+const adminUserRoutes = require('./routes/adminUserRoutes');
+const adminDepositRoutes = require('./routes/adminDepositRoutes');
+const adminWithdrawalRoutes = require('./routes/adminWithdrawalRoutes');
+const adminSettingsRoutes = require('./routes/adminSettingsRoutes');
+
 const app = express();
 
 // Connect to Database
@@ -55,6 +62,15 @@ app.use('/api/user', userRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/purchase', purchaseRoutes);
+
+// Admin route mounts
+app.use('/api/dashboard', adminDashboardRoutes);
+app.use('/api/users', adminUserRoutes);
+app.use('/api/admin/deposits', adminDepositRoutes);
+app.use('/api/deposits', adminDepositRoutes);
+app.use('/api/admin/withdrawals', adminWithdrawalRoutes);
+app.use('/api/withdrawals', adminWithdrawalRoutes);
+app.use('/api/settings', adminSettingsRoutes);
 
 app.post('/api/deposits', protect, deposit);
 app.post('/api/withdrawals', protect, withdraw);
