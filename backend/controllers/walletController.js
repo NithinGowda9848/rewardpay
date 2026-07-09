@@ -129,10 +129,6 @@ exports.withdraw = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Insufficient balance' });
     }
 
-    // Deduct balance
-    user.walletBalance = Number((user.walletBalance - wdrAmount).toFixed(2));
-    await user.save();
-
     // Create a transaction
     const transaction = await Transaction.create({
       userId: req.user._id,
