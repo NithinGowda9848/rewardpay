@@ -1,5 +1,7 @@
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
+const Deposit = require('../models/Deposit');
+const Withdrawal = require('../models/Withdrawal');
 const { collectEarnings } = require('./authController');
 
 // @desc    Initiate a deposit request
@@ -30,16 +32,13 @@ exports.deposit = async (req, res) => {
 
     // Also create a Deposit document in deposits collection for the Admin panel to read
     try {
-      const mongoose = require('mongoose');
-      await mongoose.connection.db.collection('deposits').insertOne({
+      await Deposit.create({
         user: req.user._id,
         amount: Number(amount),
         utrNumber: utr,
         screenshot: screenshot,
         status: 'Pending',
-        date: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
+        date: new Date()
       });
     } catch (dbErr) {
       console.error('Failed to sync deposit to admin DB:', dbErr);
@@ -145,15 +144,12 @@ exports.withdraw = async (req, res) => {
 
     // Also create a Withdrawal document in withdrawals collection for the Admin panel to read
     try {
-      const mongoose = require('mongoose');
-      await mongoose.connection.db.collection('withdrawals').insertOne({
+      await Withdrawal.create({
         user: req.user._id,
         amount: Number(wdrAmount),
         upiId: upiId || description,
         status: 'Pending',
-        requestDate: new Date(),
-        createdAt: new Date(),
-        updatedAt: new Date()
+        requestDate: new Date()
       });
     } catch (dbErr) {
       console.error('Failed to sync withdrawal to admin DB:', dbErr);
