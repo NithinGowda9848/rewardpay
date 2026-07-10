@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { FaChevronLeft, FaBell, FaTelegramPlane, FaTimes, FaHeadset } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
@@ -8,40 +8,41 @@ import './DashboardHeader.css';
 const DashboardHeader = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useAuth();
+  const { user, socket } = useAuth();
 
   // Notifications state
   const [showNotif, setShowNotif] = useState(false);
   const [notifications, setNotifications] = useState([]);
 
-  useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const res = await API.get('/user/notifications');
-        if (res.data.success) {
-          const readIds = JSON.parse(localStorage.getItem('read_announcements') || '[]');
-          const formatted = res.data.data.map((notif) => {
-            const isRead = notif.isAnnouncement
-              ? readIds.includes(notif._id)
-              : notif.read;
+  const fetchNotifications = useCallback(async () => {
+    if (!user) return;
+    try {
+      const res = await API.get('/user/notifications');
+      if (res.data.success) {
+        const readIds = JSON.parse(localStorage.getItem('read_announcements') || '[]');
+        const formatted = res.data.data.map((notif) => {
+          const isRead = notif.isAnnouncement
+            ? readIds.includes(notif._id)
+            : notif.read;
 
-            return {
-              id: notif._id,
-              title: notif.title,
-              message: notif.message,
-              time: new Date(notif.createdAt).toLocaleDateString() + ' ' + new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-              read: isRead,
-              isAnnouncement: notif.isAnnouncement,
-            };
-          });
+          return {
+            id: notif._id,
+            title: notif.title,
+            message: notif.message,
+            time: new Date(notif.createdAt).toLocaleDateString() + ' ' + new Date(notif.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            read: isRead,
+            isAnnouncement: notif.isAnnouncement,
+          };
+        });
 
-          setNotifications(formatted);
-        }
-      } catch (err) {
-        console.error('Failed to fetch notifications:', err);
+        setNotifications(formatted);
       }
-    };
+    } catch (err) {
+      console.error('Failed to fetch notifications:', err);
+    }
+  }, [user]);
 
+  useEffect(() => {
     if (user) {
       fetchNotifications();
 
@@ -49,7 +50,21 @@ const DashboardHeader = () => {
       const interval = setInterval(fetchNotifications, 10000);
       return () => clearInterval(interval);
     }
-  }, [user]);
+  }, [user, fetchNotifications]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('new_notification', fetchNotifications);
+    socket.on('deposit_change', fetchNotifications);
+    socket.on('withdrawal_change', fetchNotifications);
+
+    return () => {
+      socket.off('new_notification', fetchNotifications);
+      socket.off('deposit_change', fetchNotifications);
+      socket.off('withdrawal_change', fetchNotifications);
+    };
+  }, [socket, fetchNotifications]);
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 

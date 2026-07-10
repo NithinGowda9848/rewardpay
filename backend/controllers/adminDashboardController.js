@@ -22,7 +22,7 @@ const getDashboardStats = async (req, res) => {
       User.countDocuments(),
       User.countDocuments({ status: 'Active' }),
       User.countDocuments({ joinDate: { $gte: today } }),
-      UserPackage.countDocuments({ status: 'Active' }),
+      UserPackage.countDocuments({ expiresAt: { $gt: new Date() } }),
       Withdrawal.countDocuments({ status: 'Pending' }),
       Deposit.countDocuments({ status: 'Pending' }),
       User.countDocuments({ vipLevel: { $ne: 'Starter' } })
@@ -37,20 +37,20 @@ const getDashboardStats = async (req, res) => {
 
     // Aggregate Withdrawals
     const approvedWithdrawals = await Withdrawal.aggregate([
-      { $match: { status: 'Approved' } },
+      { $match: { status: { $in: ['Approved', 'Paid'] } } },
       { $group: { _id: null, total: { $sum: '$amount' } } }
     ]);
     const totalWithdrawals = approvedWithdrawals[0]?.total || 0;
 
     // Investments
     const investments = await UserPackage.aggregate([
-      { $group: { _id: null, total: { $sum: '$purchasePrice' } } }
+      { $group: { _id: null, total: { $sum: '$price' } } }
     ]);
     const totalInvestments = investments[0]?.total || 0;
 
     // Referral Commissions
     const referralComms = await Transaction.aggregate([
-      { $match: { type: 'Referral Commission', status: 'Completed' } },
+      { $match: { type: { $in: ['referral', 'Referral Commission'] }, status: { $in: ['completed', 'Completed'] } } },
       { $group: { _id: null, total: { $sum: '$amount' } } }
     ]);
     const totalReferralCommissions = referralComms[0]?.total || 0;
@@ -81,15 +81,15 @@ const getDashboardStats = async (req, res) => {
     const txStats = await Transaction.aggregate([
       {
         $match: {
-          type: { $in: ['Deposit', 'Withdrawal'] },
-          status: { $in: ['Completed', 'Approved'] }
+          type: { $in: ['deposit', 'Deposit', 'withdraw', 'Withdrawal', 'withdrawal'] },
+          status: { $in: ['completed', 'Completed', 'Approved', 'Paid'] }
         }
       },
       {
         $group: {
           _id: {
-            date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-            type: "$type"
+            date: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+            type: { $toLower: "$type" }
           },
           total: { $sum: "$amount" }
         }
@@ -97,8 +97,8 @@ const getDashboardStats = async (req, res) => {
     ]);
 
     const depVsWithChart = last7Days.map(date => {
-      const dep = txStats.find(t => t._id.date === date && t._id.type === 'Deposit')?.total || 0;
-      const withdr = txStats.find(t => t._id.date === date && t._id.type === 'Withdrawal')?.total || 0;
+      const dep = txStats.find(t => t._id.date === date && (t._id.type === 'deposit' || t._id.type === 'deposit'))?.total || 0;
+      const withdr = txStats.find(t => t._id.date === date && (t._id.type === 'withdrawal' || t._id.type === 'withdraw'))?.total || 0;
       return { date, deposit: dep, withdrawal: withdr };
     });
 
@@ -107,7 +107,7 @@ const getDashboardStats = async (req, res) => {
       {
         $lookup: {
           from: 'packages',
-          localField: 'package',
+          localField: 'packageId',
           foreignField: '_id',
           as: 'pkg'
         }
@@ -117,15 +117,15 @@ const getDashboardStats = async (req, res) => {
         $group: {
           _id: '$pkg.name',
           salesCount: { $sum: 1 },
-          revenue: { $sum: '$purchasePrice' }
+          revenue: { $sum: '$price' }
         }
       }
     ]);
 
     // Revenue Chart (Deposits - Withdrawals monthly or daily)
     const revenueChart = last7Days.map(date => {
-      const dep = txStats.find(t => t._id.date === date && t._id.type === 'Deposit')?.total || 0;
-      const withdr = txStats.find(t => t._id.date === date && t._id.type === 'Withdrawal')?.total || 0;
+      const dep = txStats.find(t => t._id.date === date && (t._id.type === 'deposit' || t._id.type === 'deposit'))?.total || 0;
+      const withdr = txStats.find(t => t._id.date === date && (t._id.type === 'withdrawal' || t._id.type === 'withdraw'))?.total || 0;
       return { date, revenue: dep - withdr };
     });
 
@@ -136,11 +136,11 @@ const getDashboardStats = async (req, res) => {
     });
 
     const depositsSpark = last7Days.map(date => {
-      return txStats.find(t => t._id.date === date && t._id.type === 'Deposit')?.total || 0;
+      return txStats.find(t => t._id.date === date && (t._id.type === 'deposit' || t._id.type === 'deposit'))?.total || 0;
     });
 
     const withdrawalsSpark = last7Days.map(date => {
-      return txStats.find(t => t._id.date === date && t._id.type === 'Withdrawal')?.total || 0;
+      return txStats.find(t => t._id.date === date && (t._id.type === 'withdrawal' || t._id.type === 'withdraw'))?.total || 0;
     });
 
     const revenueSpark = last7Days.map((date, idx) => {

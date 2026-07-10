@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-// Since the backend and frontend are likely on different ports in dev, 
-// we might need the full URL or rely on proxy in vite.config.js.
-// Assuming proxy is configured or they run on same origin in prod.
-const API_URL = 'https://s-reward-pay.onrender.com/api/auth/';
+// Dynamically resolve API URL based on environment hostname
+const API_URL = import.meta.env.VITE_API_URL
+  ? `${import.meta.env.VITE_API_URL}/auth/`
+  : (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+    ? '/api/auth/'
+    : 'https://s-reward-pay.onrender.com/api/auth/');
 
 // Use interceptor to add token to headers
 axios.interceptors.request.use(

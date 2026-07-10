@@ -3,6 +3,8 @@ const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
 const UserPackage = require('../models/UserPackage');
 const Transaction = require('../models/Transaction');
+const Admin = require('../models/Admin');
+const AuditLog = require('../models/AuditLog');
 
 const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -231,7 +233,7 @@ exports.login = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Please provide username and password' });
     }
 
-    // Get user and select password explicitly (support both username and mobile)
+    // Try user login first
     const user = await User.findOne({ 
       $or: [
         { username: username.toLowerCase() },
@@ -239,30 +241,62 @@ exports.login = async (req, res) => {
       ]
     }).select('+password');
 
-    if (!user || !(await user.matchPassword(password))) {
-      return res.status(401).json({ success: false, message: 'Invalid username or password' });
+    if (user && (await user.matchPassword(password))) {
+      await collectEarnings(user._id);
+      const updatedUser = await User.findById(user._id);
+      
+      console.log(`User logged in: ${updatedUser.username}`);
+
+      return res.status(200).json({
+        success: true,
+        token: generateToken(updatedUser._id),
+        user: {
+          id: updatedUser._id,
+          username: updatedUser.username,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          mobile: updatedUser.mobile,
+          walletBalance: updatedUser.walletBalance,
+          referralCode: updatedUser.referralCode,
+          role: updatedUser.role,
+        },
+      });
     }
 
-    // Update earnings before logging in
-    await collectEarnings(user._id);
+    // Try admin login
+    const admin = await Admin.findOne({ username });
+    if (admin && (await admin.comparePassword(password))) {
+      await AuditLog.create({
+        admin: admin.username,
+        role: admin.role,
+        action: 'Login',
+        details: 'Admin logged in successfully via unified portal',
+        ipAddress: req.ip
+      });
 
-    // Fetch updated user info
-    const updatedUser = await User.findById(user._id);
+      console.log(`Admin logged in: ${admin.username}`);
 
-    res.status(200).json({
-      success: true,
-      token: generateToken(updatedUser._id),
-      user: {
-        id: updatedUser._id,
-        username: updatedUser.username,
-        name: updatedUser.name,
-        email: updatedUser.email,
-        mobile: updatedUser.mobile,
-        walletBalance: updatedUser.walletBalance,
-        referralCode: updatedUser.referralCode,
-        role: updatedUser.role,
-      },
-    });
+      return res.status(200).json({
+        success: true,
+        token: generateToken(admin._id),
+        user: {
+          id: admin._id,
+          username: admin.username,
+          name: admin.username,
+          email: admin.email,
+          avatar: admin.avatar,
+          role: admin.role,
+        },
+        _id: admin._id,
+        username: admin.username,
+        email: admin.email,
+        role: admin.role,
+        avatar: admin.avatar,
+        token: generateToken(admin._id)
+      });
+    }
+
+    return res.status(401).json({ success: false, message: 'Invalid username or password' });
   } catch (error) {
     console.error('Login Error:', error);
     res.status(500).json({ success: false, message: error.message });
@@ -474,3 +508,82 @@ exports.resetPassword = async (req, res) => {
 
 // Export helper for other controllers
 exports.collectEarnings = collectEarnings;
+
+exports.getAdminProfile = async (req, res) => {
+  try {
+    const admin = await Admin.findById(req.admin._id).select('-password');
+    if (admin) {
+      res.json(admin);
+    } else {
+      res.status(404).json({ message: 'Admin not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateAdminProfile = async (req, res) => {
+  const { username, email, avatar } = req.body;
+
+  try {
+    const admin = await Admin.findById(req.admin._id);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+
+    admin.username = username || admin.username;
+    admin.email = email || admin.email;
+    admin.avatar = avatar || admin.avatar;
+
+    const updatedAdmin = await admin.save();
+
+    await AuditLog.create({
+      admin: admin.username,
+      role: admin.role,
+      action: 'Update Profile',
+      details: 'Admin profile details updated',
+      ipAddress: req.ip
+    });
+
+    res.json({
+      _id: updatedAdmin._id,
+      username: updatedAdmin.username,
+      email: updatedAdmin.email,
+      role: updatedAdmin.role,
+      avatar: updatedAdmin.avatar
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.updateAdminPassword = async (req, res) => {
+  const { currentPassword, newPassword } = req.body;
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ message: 'Please specify current and new password' });
+  }
+
+  try {
+    const admin = await Admin.findById(req.admin._id);
+    if (!admin) return res.status(404).json({ message: 'Admin not found' });
+
+    const isMatch = await admin.comparePassword(currentPassword);
+    if (!isMatch) {
+      return res.status(400).json({ message: 'Incorrect current password' });
+    }
+
+    admin.password = newPassword;
+    await admin.save();
+
+    await AuditLog.create({
+      admin: admin.username,
+      role: admin.role,
+      action: 'Change Password',
+      details: 'Admin updated password securely',
+      ipAddress: req.ip
+    });
+
+    res.json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};

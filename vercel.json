@@ -1,5 +1,0 @@
-{
-  "rewrites": [
-    { "source": "/((?!api|images).*)", "destination": "/frontend/dist/index.html" }
-  ]
-}

@@ -1,9 +1,11 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-    ? 'http://localhost:5000/api'
-    : 'https://s-reward-pay.onrender.com/api',
+  baseURL: import.meta.env.VITE_API_URL || (
+    window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+      ? 'http://localhost:5000/api'
+      : 'https://s-reward-pay.onrender.com/api'
+  ),
   headers: {
     'Content-Type': 'application/json',
   },

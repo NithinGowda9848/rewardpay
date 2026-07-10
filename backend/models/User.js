@@ -69,6 +69,35 @@ const UserSchema = new mongoose.Schema(
       enum: ['user', 'admin'],
       default: 'user',
     },
+    status: {
+      type: String,
+      enum: ['Active', 'Blocked'],
+      default: 'Active',
+    },
+    vipLevel: {
+      type: String,
+      default: 'Starter',
+    },
+    bonusWallet: {
+      type: Number,
+      default: 0.0,
+    },
+    commissionWallet: {
+      type: Number,
+      default: 0.0,
+    },
+    rewardWallet: {
+      type: Number,
+      default: 0.0,
+    },
+    transferWallet: {
+      type: Number,
+      default: 0.0,
+    },
+    joinDate: {
+      type: Date,
+      default: Date.now,
+    },
   },
   {
     timestamps: true,

@@ -1,8 +1,18 @@
 // Server entrypoint with correct DB configuration
 const path = require('path');
 require('dotenv').config({ path: path.resolve(__dirname, '.env') });
+
+console.log('--- ENV VARIABLE CHECK ---');
+console.log(`MONGODB_URI is ${process.env.MONGODB_URI ? 'SET' : 'MISSING'}`);
+console.log(`JWT_SECRET is ${process.env.JWT_SECRET ? 'SET' : 'MISSING'}`);
+console.log(`ADMIN_SECRET is ${process.env.ADMIN_SECRET ? 'SET' : 'MISSING'}`);
+console.log(`CORS_ORIGIN is ${process.env.CORS_ORIGIN ? 'SET' : 'MISSING'}`);
+console.log('--------------------------');
+
 const express = require('express');
 const cors = require('cors');
+const http = require('http');
+const { Server } = require('socket.io');
 const connectDB = require('./config/db');
 const Package = require('./models/Package');
 const helmet = require('helmet');
@@ -21,12 +31,45 @@ const adminUserRoutes = require('./routes/adminUserRoutes');
 const adminDepositRoutes = require('./routes/adminDepositRoutes');
 const adminWithdrawalRoutes = require('./routes/adminWithdrawalRoutes');
 const adminSettingsRoutes = require('./routes/adminSettingsRoutes');
+const adminPackageRoutes = require('./routes/packageRoutes');
+const adminVipRoutes = require('./routes/vipRoutes');
+const adminNetworkRoutes = require('./routes/networkRoutes');
+const adminTicketRoutes = require('./routes/ticketRoutes');
+const adminAnnouncementRoutes = require('./routes/announcementRoutes');
+const adminNotificationRoutes = require('./routes/notificationRoutes');
+const adminWalletRoutes = require('./routes/adminWalletRoutes');
+const adminTransactionRoutes = require('./routes/adminTransactionRoutes');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH']
+  }
+});
 
 // Connect to Database
 connectDB().then(() => {
   seedPackages();
+  // Initialize Database Change Streams
+  const { initChangeStreams } = require('./config/changeStreams');
+  initChangeStreams(io);
+});
+
+// Real-Time Events Map
+io.on('connection', (socket) => {
+  console.log(`Socket client connected: ${socket.id}`);
+  
+  socket.on('disconnect', () => {
+    console.log(`Socket client disconnected: ${socket.id}`);
+  });
+});
+
+// Make Socket.IO available to express handlers via req
+app.use((req, res, next) => {
+  req.io = io;
+  next();
 });
 
 // Middleware
@@ -74,6 +117,14 @@ app.use('/api/deposits', adminDepositRoutes);
 app.use('/api/admin/withdrawals', adminWithdrawalRoutes);
 app.use('/api/withdrawals', adminWithdrawalRoutes);
 app.use('/api/settings', adminSettingsRoutes);
+app.use('/api/packages', adminPackageRoutes);
+app.use('/api/vip', adminVipRoutes);
+app.use('/api/network', adminNetworkRoutes);
+app.use('/api/tickets', adminTicketRoutes);
+app.use('/api/announcements', adminAnnouncementRoutes);
+app.use('/api/notifications', adminNotificationRoutes);
+app.use('/api/wallets', adminWalletRoutes);
+app.use('/api/transactions', adminTransactionRoutes);
 
 // Base route for checkups
 app.get('/', (req, res) => {
@@ -374,7 +425,7 @@ async function seedPackages() {
 
 // Start server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
 });
 // Trigger nodemon retry 3

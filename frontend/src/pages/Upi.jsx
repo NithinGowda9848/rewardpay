@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import API from '../services/api';
@@ -19,7 +19,7 @@ import {
 import './Upi.css';
 
 const Upi = () => {
-  const { user, refreshUser } = useAuth();
+  const { user, refreshUser, socket } = useAuth();
   const location = useLocation();
   
   // Tab control: 'deposit' | 'withdraw'
@@ -76,7 +76,7 @@ const Upi = () => {
     }
   };
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     try {
       const res = await API.get('/wallet/transactions');
       if (res.data.success) {
@@ -88,11 +88,28 @@ const Upi = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchTransactions();
-  }, []);
+  }, [fetchTransactions]);
+
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUpdate = () => {
+      console.log('Socket transaction change detected, re-fetching...');
+      fetchTransactions();
+    };
+
+    socket.on('deposit_change', handleUpdate);
+    socket.on('withdrawal_change', handleUpdate);
+
+    return () => {
+      socket.off('deposit_change', handleUpdate);
+      socket.off('withdrawal_change', handleUpdate);
+    };
+  }, [socket, fetchTransactions]);
 
   useEffect(() => {
     if (location.state && location.state.amount) {
@@ -155,8 +172,8 @@ const Upi = () => {
       });
 
       if (res.data.success) {
-        setModalTitle('Deposit Request Submitted Successfully.');
-        setModalMsg(`Your deposit request for ₹${depAmount.toFixed(2)} has been submitted with UTR: ${utr}. It is currently pending verification.`);
+        setModalTitle('Pending Approval');
+        setModalMsg(`Your deposit request for ₹${depAmount.toFixed(2)} has been submitted with UTR: ${utr}. It is currently pending verification and approval.`);
         setIsModalOpen(true);
         setAmount('');
         setUtr('');
@@ -166,7 +183,11 @@ const Upi = () => {
         fetchTransactions(); // Refresh log
       }
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Deposit submission failed');
+      if (!err.response) {
+        setFormError('Server unavailable. Please verify the backend API server is running.');
+      } else {
+        setFormError(err.response.data?.message || err.message || 'Deposit submission failed');
+      }
     } finally {
       setTxLoading(false);
     }
@@ -215,7 +236,7 @@ const Upi = () => {
       const res = await API.post('/withdrawals', payload);
 
       if (res.data.success) {
-        setModalTitle('Withdrawal Requested!');
+        setModalTitle('Withdrawal Request Submitted');
         const displayTarget = withdrawMethod === 'upi' ? `UPI ID: ${withdrawUpi}` : `Bank A/C: ${accountNumber}`;
         setModalMsg(`A withdrawal request of ₹${wdrAmount.toFixed(2)} to ${displayTarget} has been submitted successfully and is pending approval.`);
         setIsModalOpen(true);
@@ -229,7 +250,11 @@ const Upi = () => {
         fetchTransactions();
       }
     } catch (err) {
-      setFormError(err.response?.data?.message || 'Withdrawal request failed');
+      if (!err.response) {
+        setFormError('Server unavailable. Please verify the backend API server is running.');
+      } else {
+        setFormError(err.response.data?.message || err.message || 'Withdrawal request failed');
+      }
     } finally {
       setTxLoading(false);
     }

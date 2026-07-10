@@ -8,12 +8,12 @@ const Support = () => {
 
   const faqs = [
     {
-      q: 'How long does a deposit verification take?',
-      a: 'Deposits are normally credited immediately after you input your payment details and click "Verify". In rare cases, UPI network congestion might delay verification up to 10 minutes.'
+      q: 'How long does a Deposite Funds verification take?',
+      a: 'Deposite Funds are normally credited immediately after you input your payment details and click "Verify". In rare cases, UPI network congestion might delay verification up to 10 minutes.'
     },
     {
-      q: 'What is the minimum withdrawal limit?',
-      a: 'The minimum withdrawal limit is ₹300.00. You can request withdrawals directly to your target UPI ID or bank account details anytime.'
+      q: 'What is the minimum Withdraw Funds limit?',
+      a: 'The minimum Withdraw Funds limit is ₹300.00. You can request Withdraw Funds directly to your target UPI ID or bank account details anytime.'
     },
     {
       q: 'How does the MLM Referral Rebate program work?',

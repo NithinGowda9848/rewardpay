@@ -9,6 +9,9 @@ import { FaCalendarAlt, FaCoins, FaCheckCircle, FaExclamationTriangle, FaCopy, F
 import './Buy.css';
 
 const getBackendHost = () => {
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL.replace(/\/api$/, '');
+  }
   const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
   return isLocalhost ? 'http://localhost:5000' : 'https://s-reward-pay.onrender.com';
 };

@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const { register, login, googleAuth, getMe, resetPassword } = require('../controllers/authController');
+const { register, login, googleAuth, getMe, resetPassword, getAdminProfile, updateAdminProfile, updateAdminPassword } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
+const { protect: protectAdmin } = require('../middleware/adminAuth');
 const { check } = require('express-validator');
 const { validate } = require('../middleware/validate');
 
@@ -26,5 +27,10 @@ router.post('/reset-password', [
 
 router.post('/google', googleAuth);
 router.get('/me', protect, getMe);
+
+// Admin Profile routes
+router.get('/profile', protectAdmin, getAdminProfile);
+router.put('/profile', protectAdmin, updateAdminProfile);
+router.put('/change-password', protectAdmin, updateAdminPassword);
 
 module.exports = router;
