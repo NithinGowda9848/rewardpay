@@ -118,6 +118,11 @@ app.use('/api/notifications', adminNotificationRoutes);
 app.use('/api/wallets', adminWalletRoutes);
 app.use('/api/transactions', adminTransactionRoutes);
 
+// Diagnostic version route
+app.get('/api/version', (req, res) => {
+  res.json({ version: '1.0.1', deployedAt: new Date().toISOString() });
+});
+
 // Base route for checkups
 app.get('/', (req, res) => {
   res.json({ message: 'Earning Rewards Dashboard API running successfully' });
