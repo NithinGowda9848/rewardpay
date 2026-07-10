@@ -97,25 +97,17 @@ const frontendDistPath = path.join(__dirname, '../frontend/dist');
 app.use(express.static(frontendDistPath));
 
 // Routes
-const { protect } = require('./middleware/auth');
-const { deposit, withdraw } = require('./controllers/walletController');
-
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);
 app.use('/api/wallet', walletRoutes);
 app.use('/api/team', teamRoutes);
 app.use('/api/purchase', purchaseRoutes);
 
-app.post('/api/deposits', protect, deposit);
-app.post('/api/withdrawals', protect, withdraw);
-
 // Admin route mounts
 app.use('/api/dashboard', adminDashboardRoutes);
 app.use('/api/users', adminUserRoutes);
 app.use('/api/admin/deposits', adminDepositRoutes);
-app.use('/api/deposits', adminDepositRoutes);
 app.use('/api/admin/withdrawals', adminWithdrawalRoutes);
-app.use('/api/withdrawals', adminWithdrawalRoutes);
 app.use('/api/settings', adminSettingsRoutes);
 app.use('/api/packages', adminPackageRoutes);
 app.use('/api/vip', adminVipRoutes);
