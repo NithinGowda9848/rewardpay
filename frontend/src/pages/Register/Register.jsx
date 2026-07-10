@@ -16,8 +16,9 @@ const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  const { register } = useContext(AuthContext);
+  const [success, setSuccess] = useState('');
+
+  const { register, logout } = useContext(AuthContext);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
@@ -54,10 +55,14 @@ const Register = () => {
     setError('');
     setLoading(true);
     try {
+      // If user is logged in (came from referral link), log them out first
+      if (localStorage.getItem('user')) {
+        localStorage.removeItem('user');
+      }
       await authService.register(formData);
       localStorage.removeItem('user');
-      alert('Registration successful! Please login to your account.');
-      navigate('/login');
+      setSuccess('Registration successful! Please login to your account.');
+      setTimeout(() => navigate('/login'), 2000);
     } catch (err) {
       console.error('Registration failed:', err);
       setError(err.response?.data?.message || 'Registration failed');
@@ -82,6 +87,7 @@ const Register = () => {
         <p className={styles.subtitle}>Create Your Account</p>
 
         {error && <div className={styles.errorText} style={{marginBottom: 15, textAlign: 'center'}}>{error}</div>}
+        {success && <div style={{marginBottom: 15, textAlign: 'center', color: '#10b981', fontWeight: 600}}>✅ {success}</div>}
 
         <form onSubmit={handleSubmit}>
           {/* Username */}

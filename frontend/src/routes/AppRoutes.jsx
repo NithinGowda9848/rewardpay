@@ -1,5 +1,5 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import DashboardLayout from '../layouts/DashboardLayout';
 
@@ -13,12 +13,18 @@ import Support from '../pages/Support';
 import Login from '../pages/Login/Login';
 import Register from '../pages/Register/Register';
 
-// Public Route Guard (redirects logged-in users to home)
+// Public Route Guard (redirects logged-in users to home, but allows referral links)
 const PublicRoute = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) return null;
-  return user ? <Navigate to="/" replace /> : children;
+
+  // Allow referral registration even when logged in
+  const hasRef = new URLSearchParams(location.search).get('ref');
+  if (user && !hasRef) return <Navigate to="/" replace />;
+
+  return children;
 };
 
 // Private Route Guard (redirects unauthenticated users to login)
