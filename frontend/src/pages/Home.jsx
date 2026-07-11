@@ -47,10 +47,12 @@ const Home = () => {
   };
 
   const getTransactionIcon = (type) => {
-    switch (type) {
+    const t = type ? type.toLowerCase() : '';
+    switch (t) {
       case 'deposit':
         return <div className="tx-icon-wrapper type-deposit"><FaPlus /></div>;
       case 'withdraw':
+      case 'withdrawal':
         return <div className="tx-icon-wrapper type-withdraw"><FaArrowDown /></div>;
       case 'purchase':
         return <div className="tx-icon-wrapper type-purchase"><FaArrowUp /></div>;
@@ -345,8 +347,8 @@ const Home = () => {
                     </div>
                   </div>
                   <div className="activity-right">
-                    <span className={`activity-amount ${tx.type === 'deposit' || tx.type === 'reward' || tx.type === 'referral' ? 'positive' : 'negative'}`}>
-                      {tx.type === 'deposit' || tx.type === 'reward' || tx.type === 'referral' ? '+' : '-'}₹{tx.amount?.toFixed(2)}
+                    <span className={`activity-amount ${tx.type?.toLowerCase() === 'deposit' || tx.type?.toLowerCase() === 'reward' || tx.type?.toLowerCase() === 'referral' ? 'positive' : 'negative'}`}>
+                      {tx.type?.toLowerCase() === 'deposit' || tx.type?.toLowerCase() === 'reward' || tx.type?.toLowerCase() === 'referral' ? '+' : '-'}₹{tx.amount?.toFixed(2)}
                     </span>
                     <span className={`tx-status ${getTransactionStatusClass(tx.status)}`}>
                       {tx.status}

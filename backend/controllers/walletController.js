@@ -200,10 +200,9 @@ exports.getTransactions = async (req, res) => {
     // Refresh earnings to show latest reward transactions if any
     await collectEarnings(req.user._id);
 
-    const [deposits, withdrawals, otherTransactions] = await Promise.all([
+    const [deposits, withdrawals] = await Promise.all([
       Deposit.find({ $or: [{ user: req.user._id }, { userId: req.user._id }] }),
-      Withdrawal.find({ $or: [{ user: req.user._id }, { userId: req.user._id }] }),
-      Transaction.find({ userId: req.user._id, type: { $in: ['reward', 'referral', 'purchase'] } })
+      Withdrawal.find({ $or: [{ user: req.user._id }, { userId: req.user._id }] })
     ]);
 
     const formattedDeposits = deposits.map(d => ({
@@ -214,7 +213,7 @@ exports.getTransactions = async (req, res) => {
       paymentTime: d.paymentTime,
       adminRemark: d.adminRemark,
       screenshot: d.screenshot,
-      type: 'deposit',
+      type: 'Deposit',
       flow: 'in',
       description: `Deposit via UPI (UTR: ${d.utrNumber})`,
       createdAt: d.createdAt,
@@ -232,25 +231,14 @@ exports.getTransactions = async (req, res) => {
         amount: w.amount,
         status: w.status,
         adminRemark: w.adminRemark,
-        type: 'withdraw',
+        type: 'Withdrawal',
         flow: 'out',
         description,
         createdAt: w.createdAt,
       };
     });
 
-    const formattedOthers = otherTransactions.map(tx => ({
-      _id: tx._id,
-      amount: tx.amount,
-      status: tx.status,
-      adminRemark: tx.adminRemark,
-      type: tx.type,
-      flow: tx.type === 'purchase' ? 'out' : 'in',
-      description: tx.description,
-      createdAt: tx.createdAt,
-    }));
-
-    const combined = [...formattedDeposits, ...formattedWithdrawals, ...formattedOthers].sort(
+    const combined = [...formattedDeposits, ...formattedWithdrawals].sort(
       (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
     );
 
