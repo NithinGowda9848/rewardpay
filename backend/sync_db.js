@@ -70,6 +70,17 @@ const run = async () => {
         });
       }
 
+      // Backfill missing/null transactionId for legacy transactions to prevent index errors
+      if (colName === 'transactions') {
+        docs.forEach((doc, idx) => {
+          if (!doc.transactionId) {
+            const prefix = doc.type ? doc.type.substring(0, 3).toUpperCase() : 'TX';
+            const dateStr = doc.createdAt ? new Date(doc.createdAt).getTime() : Date.now();
+            doc.transactionId = `${prefix}${dateStr}${idx}${Math.floor(100 + Math.random() * 900)}`;
+          }
+        });
+      }
+
       // 2. Clear target collection to avoid duplicate key errors
       console.log(`Clearing target collection ${targetDbName}.${colName}...`);
       await targetDb.collection(colName).deleteMany({});
