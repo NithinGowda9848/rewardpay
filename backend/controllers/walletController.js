@@ -53,6 +53,12 @@ exports.deposit = async (req, res) => {
       console.error('Failed to sync deposit to admin DB:', dbErr);
     }
 
+    // Emit Socket.IO updates for live update on database change
+    if (req.io) {
+      req.io.emit('deposit_change');
+      req.io.emit('dashboard_update');
+    }
+
     res.status(201).json({
       success: true,
       message: 'Deposit Request Submitted Successfully',
@@ -168,6 +174,12 @@ exports.withdraw = async (req, res) => {
       });
     } catch (dbErr) {
       console.error('Failed to sync withdrawal to admin DB:', dbErr);
+    }
+
+    // Emit Socket.IO updates for live update on database change
+    if (req.io) {
+      req.io.emit('withdrawal_change');
+      req.io.emit('dashboard_update');
     }
 
     res.status(201).json({
