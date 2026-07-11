@@ -58,10 +58,19 @@ export default function UpiScreen({ navigation, route }) {
 
   const fetchTransactions = async () => {
     try {
-      const res = await API.get('/wallet/transactions');
-      if (res.data.success) {
-        setTransactions(res.data.data);
+      const [depRes, wdrRes] = await Promise.all([
+        API.get('/wallet/deposits'),
+        API.get('/wallet/withdrawals')
+      ]);
+      let combined = [];
+      if (depRes.data.success) {
+        combined = [...combined, ...depRes.data.data];
       }
+      if (wdrRes.data.success) {
+        combined = [...combined, ...wdrRes.data.data];
+      }
+      combined.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+      setTransactions(combined);
     } catch (err) {
       console.warn('Error fetching transactions:', err);
     } finally {

@@ -2,6 +2,15 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const UserPackage = require('../models/UserPackage');
 
+// Helper: build a query filter that matches referredBy as either an ObjectId or a referralCode string
+const buildReferredByFilter = (userIds, referralCodes) => {
+  const conditions = [];
+  if (userIds.length > 0) conditions.push({ referredBy: { $in: userIds } });
+  if (referralCodes.length > 0) conditions.push({ referredBy: { $in: referralCodes } });
+  if (conditions.length === 0) return null;
+  return { $or: conditions };
+};
+
 exports.getNetworkStats = async (req, res) => {
   try {
     const totalReferrals = await User.countDocuments({ referredBy: { $ne: null } });
@@ -34,6 +43,8 @@ exports.getNetworkTree = async (req, res) => {
     const user = await User.findById(userId);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
+    const selectFields = 'name email referralCode vipLevel walletBalance bonusWallet commissionWallet rewardWallet transferWallet totalEarnings status';
+
     // Build tree root
     const tree = {
       id: user._id,
@@ -48,7 +59,8 @@ exports.getNetworkTree = async (req, res) => {
     };
 
     // L1 (referred by L0)
-    const l1List = await User.find({ referredBy: user._id }).select('name email referralCode vipLevel walletBalance bonusWallet commissionWallet rewardWallet transferWallet totalEarnings status');
+    const l1Filter = buildReferredByFilter([user._id], user.referralCode ? [user.referralCode] : []);
+    const l1List = l1Filter ? await User.find(l1Filter).select(selectFields) : [];
     
     const l1Nodes = [];
     let l2CountAcc = 0;
@@ -56,13 +68,15 @@ exports.getNetworkTree = async (req, res) => {
 
     for (const l1User of l1List) {
       // L2 (referred by L1)
-      const l2List = await User.find({ referredBy: l1User._id }).select('name email referralCode vipLevel walletBalance bonusWallet commissionWallet rewardWallet transferWallet totalEarnings status');
+      const l2Filter = buildReferredByFilter([l1User._id], l1User.referralCode ? [l1User.referralCode] : []);
+      const l2List = l2Filter ? await User.find(l2Filter).select(selectFields) : [];
       l2CountAcc += l2List.length;
 
       const l2Nodes = [];
       for (const l2User of l2List) {
         // L3 (referred by L2)
-        const l3List = await User.find({ referredBy: l2User._id }).select('name email referralCode vipLevel walletBalance bonusWallet commissionWallet rewardWallet transferWallet totalEarnings status');
+        const l3Filter = buildReferredByFilter([l2User._id], l2User.referralCode ? [l2User.referralCode] : []);
+        const l3List = l3Filter ? await User.find(l3Filter).select(selectFields) : [];
         l3CountAcc += l3List.length;
 
         l2Nodes.push({

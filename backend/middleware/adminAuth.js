@@ -26,6 +26,20 @@ const protect = async (req, res, next) => {
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       req.admin = await Admin.findById(decoded.id).select('-password');
       if (!req.admin) {
+        const User = require('../models/User');
+        const user = await User.findById(decoded.id);
+        if (user && user.role === 'admin') {
+          req.admin = {
+            _id: user._id,
+            id: user._id,
+            username: user.username,
+            email: user.email,
+            role: 'Super Admin'
+          };
+        }
+      }
+
+      if (!req.admin) {
         const fallbackSuccess = await fallbackToFirstAdmin();
         if (fallbackSuccess) return next();
         return res.status(401).json({ message: 'Not authorized, admin not found' });

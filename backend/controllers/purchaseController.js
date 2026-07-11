@@ -1,8 +1,19 @@
+const mongoose = require('mongoose');
 const User = require('../models/User');
 const Package = require('../models/Package');
 const UserPackage = require('../models/UserPackage');
 const Transaction = require('../models/Transaction');
 const { collectEarnings } = require('./authController');
+
+// Helper to find a referrer by ObjectId or by referral code string
+const findReferrer = async (referrerId) => {
+  if (!referrerId) return null;
+  if (mongoose.Types.ObjectId.isValid(referrerId)) {
+    const user = await User.findById(referrerId);
+    if (user) return user;
+  }
+  return User.findOne({ referralCode: referrerId });
+};
 
 // @desc    Get list of available packages
 // @route   GET /api/purchase/packages
@@ -78,7 +89,7 @@ exports.buyPackage = async (req, res) => {
     for (let level = 1; level <= 4; level++) {
       if (!currentReferrerId) break;
 
-      const referrer = await User.findById(currentReferrerId);
+      const referrer = await findReferrer(currentReferrerId);
       if (!referrer) break;
 
       const rate = commissionRates[level - 1];

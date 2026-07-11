@@ -2,6 +2,8 @@ const User = require('../models/User');
 const UserPackage = require('../models/UserPackage');
 const Transaction = require('../models/Transaction');
 const AuditLog = require('../models/AuditLog');
+const Deposit = require('../models/Deposit');
+const Withdrawal = require('../models/Withdrawal');
 
 const getUsers = async (req, res) => {
   const { search, status, vip } = req.query;
@@ -132,11 +134,21 @@ const getUserDetails = async (req, res) => {
       .populate('package')
       .sort({ purchaseDate: -1 });
 
-    // 2. Transaction History
-    const transactions = await Transaction.find({ user: id })
-      .sort({ date: -1 });
+    // 2. Transaction History (Fixed: field is userId, sort by createdAt)
+    const transactions = await Transaction.find({ userId: id })
+      .sort({ createdAt: -1 });
 
-    // 3. Referral Team (up to Level 3)
+    // 3. Deposit History
+    const deposits = await Deposit.find({
+      $or: [{ user: id }, { userId: id }]
+    }).sort({ createdAt: -1 });
+
+    // 4. Withdrawal History
+    const withdrawals = await Withdrawal.find({
+      $or: [{ user: id }, { userId: id }]
+    }).sort({ createdAt: -1 });
+
+    // 5. Referral Team (up to Level 3)
     // Level 1
     const level1 = await User.find({ referredBy: user.referralCode }).select('name email mobile vipLevel joinDate referralCode walletBalance bonusWallet commissionWallet rewardWallet transferWallet totalEarnings');
     const level1Codes = level1.map(u => u.referralCode);
@@ -158,6 +170,8 @@ const getUserDetails = async (req, res) => {
       personalInfo: user,
       investments,
       transactions,
+      deposits,
+      withdrawals,
       referralTeam: {
         level1,
         level2,

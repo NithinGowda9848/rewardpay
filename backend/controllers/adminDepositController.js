@@ -15,9 +15,18 @@ const getDeposits = async (req, res) => {
 
     const deposits = await Deposit.find(query)
       .populate('user', 'name email mobile')
+      .populate('userId', 'name email mobile')
       .sort({ createdAt: -1 });
 
-    res.json(deposits);
+    const formattedDeposits = deposits.map(d => {
+      const obj = d.toObject ? d.toObject() : d;
+      const userDetails = obj.user || obj.userId;
+      obj.user = userDetails;
+      obj.userId = userDetails;
+      return obj;
+    });
+
+    res.json(formattedDeposits);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -27,7 +36,7 @@ const approveDeposit = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const deposit = await Deposit.findById(id).populate('user');
+    const deposit = await Deposit.findById(id).populate('user').populate('userId');
     if (!deposit) return res.status(404).json({ message: 'Deposit not found' });
     if (deposit.status !== 'Pending') {
       return res.status(400).json({ message: `Deposit already ${deposit.status.toLowerCase()}` });
@@ -38,7 +47,7 @@ const approveDeposit = async (req, res) => {
     await deposit.save();
 
     // 2. Increase user's walletBalance
-    const user = deposit.user;
+    const user = deposit.user || deposit.userId;
     if (!user) {
       return res.status(404).json({ message: 'User associated with this deposit not found' });
     }
@@ -101,7 +110,7 @@ const rejectDeposit = async (req, res) => {
   const { adminRemark } = req.body;
 
   try {
-    const deposit = await Deposit.findById(id).populate('user');
+    const deposit = await Deposit.findById(id).populate('user').populate('userId');
     if (!deposit) return res.status(404).json({ message: 'Deposit not found' });
     if (deposit.status !== 'Pending') {
       return res.status(400).json({ message: `Deposit already ${deposit.status.toLowerCase()}` });
@@ -121,9 +130,11 @@ const rejectDeposit = async (req, res) => {
       { $set: { status: 'Rejected', adminRemark: adminRemark || 'Rejected by Admin' } }
     );
 
+    const user = deposit.user || deposit.userId;
+
     // Notification
     await Notification.create({
-      userId: deposit.user?._id,
+      userId: user?._id,
       title: 'Deposit Rejected',
       message: `Your deposit request of ₹${deposit.amount} has been rejected by admin. Reason: ${adminRemark || 'N/A'}`,
       type: 'Error'
@@ -134,7 +145,7 @@ const rejectDeposit = async (req, res) => {
       admin: req.admin.username,
       role: req.admin.role,
       action: 'Reject Deposit',
-      details: `Rejected ₹${deposit.amount} deposit for ${deposit.user?.email}. Reason: ${adminRemark || 'N/A'}`,
+      details: `Rejected ₹${deposit.amount} deposit for ${user?.email || 'N/A'}. Reason: ${adminRemark || 'N/A'}`,
       ipAddress: req.ip
     });
 

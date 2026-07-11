@@ -11,7 +11,9 @@ const {
   adminRejectDeposit,
   adminConfirmWithdrawal,
   adminRejectWithdrawal,
-  adminGetAllPending
+  adminGetAllPending,
+  getUserDeposits,
+  getUserWithdrawals
 } = require('../controllers/walletController');
 const { protect, admin } = require('../middleware/auth');
 
@@ -22,6 +24,8 @@ router.post('/deposit/confirm/:id', confirmDeposit);
 router.post('/withdraw', withdraw);
 router.get('/transactions', getTransactions);
 router.get('/balance', getBalance);
+router.get('/deposits', getUserDeposits);
+router.get('/withdrawals', getUserWithdrawals);
 
 // Admin routes
 router.get('/admin/pending', admin, adminGetAllPending);

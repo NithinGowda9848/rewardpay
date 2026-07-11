@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
 const User = require('../models/User');
@@ -23,6 +24,17 @@ const generateReferralCode = (name) => {
     digits += Math.floor(Math.random() * 10);
   }
   return (firstName || 'user').toLowerCase() + digits;
+};
+
+// Helper to find a referrer by ObjectId or by referral code string
+const findReferrer = async (referrerId) => {
+  if (!referrerId) return null;
+  if (mongoose.Types.ObjectId.isValid(referrerId)) {
+    const user = await User.findById(referrerId);
+    if (user) return user;
+  }
+  // Fallback: treat as a referral code string
+  return User.findOne({ referralCode: referrerId });
 };
 
 // Helper to dynamically collect earnings for active packages
@@ -177,7 +189,7 @@ exports.register = async (req, res) => {
     for (let level = 1; level <= 4; level++) {
       if (!currentReferrerId) break;
 
-      const referrer = await User.findById(currentReferrerId);
+      const referrer = await findReferrer(currentReferrerId);
       if (!referrer) break;
 
       const rate = commissionRates[level - 1];
@@ -411,7 +423,7 @@ exports.googleAuth = async (req, res) => {
       const commissionRates = [0.10, 0.05, 0.03, 0.02];
       for (let level = 1; level <= 4; level++) {
         if (!currentReferrerId) break;
-        const referrer = await User.findById(currentReferrerId);
+        const referrer = await findReferrer(currentReferrerId);
         if (!referrer) break;
         const rate = commissionRates[level - 1];
         const commissionAmount = Number((welcomeBonus * rate).toFixed(2));

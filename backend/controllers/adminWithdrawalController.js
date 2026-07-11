@@ -16,9 +16,18 @@ const getWithdrawals = async (req, res) => {
 
     const withdrawals = await Withdrawal.find(query)
       .populate('user', 'name email mobile')
+      .populate('userId', 'name email mobile')
       .sort({ createdAt: -1 });
 
-    res.json(withdrawals);
+    const formattedWithdrawals = withdrawals.map(w => {
+      const obj = w.toObject ? w.toObject() : w;
+      const userDetails = obj.user || obj.userId;
+      obj.user = userDetails;
+      obj.userId = userDetails;
+      return obj;
+    });
+
+    res.json(formattedWithdrawals);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -28,13 +37,13 @@ const approveWithdrawal = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const withdrawal = await Withdrawal.findById(id).populate('user');
+    const withdrawal = await Withdrawal.findById(id).populate('user').populate('userId');
     if (!withdrawal) return res.status(404).json({ message: 'Withdrawal not found' });
     if (withdrawal.status !== 'Pending') {
       return res.status(400).json({ message: `Withdrawal already ${withdrawal.status.toLowerCase()}` });
     }
 
-    const user = withdrawal.user;
+    const user = withdrawal.user || withdrawal.userId;
     if (!user) {
       return res.status(404).json({ message: 'User associated with this withdrawal not found' });
     }
@@ -110,7 +119,7 @@ const rejectWithdrawal = async (req, res) => {
   const { adminRemark } = req.body;
 
   try {
-    const withdrawal = await Withdrawal.findById(id).populate('user');
+    const withdrawal = await Withdrawal.findById(id).populate('user').populate('userId');
     if (!withdrawal) return res.status(404).json({ message: 'Withdrawal not found' });
     if (withdrawal.status !== 'Pending') {
       return res.status(400).json({ message: `Withdrawal already ${withdrawal.status.toLowerCase()}` });
@@ -121,7 +130,7 @@ const rejectWithdrawal = async (req, res) => {
     withdrawal.adminRemark = adminRemark || 'Rejected by Admin';
     await withdrawal.save();
 
-    const user = withdrawal.user;
+    const user = withdrawal.user || withdrawal.userId;
     if (user) {
       if (withdrawal.isReserved) {
         user.walletBalance = Number((user.walletBalance + withdrawal.amount).toFixed(2));
@@ -142,7 +151,7 @@ const rejectWithdrawal = async (req, res) => {
 
     // Send notification
     await Notification.create({
-      userId: withdrawal.user?._id,
+      userId: user?._id,
       title: 'Withdrawal Rejected',
       message: `Your withdrawal request of ₹${withdrawal.amount} was rejected by admin. Reason: ${adminRemark || 'N/A'}`,
       type: 'Error'
@@ -153,7 +162,7 @@ const rejectWithdrawal = async (req, res) => {
       admin: req.admin.username,
       role: req.admin.role,
       action: 'Reject Withdrawal',
-      details: `Rejected ₹${withdrawal.amount} withdrawal for ${withdrawal.user?.email}. Reason: ${adminRemark || 'N/A'}`,
+      details: `Rejected ₹${withdrawal.amount} withdrawal for ${user?.email || 'N/A'}. Reason: ${adminRemark || 'N/A'}`,
       ipAddress: req.ip
     });
 
