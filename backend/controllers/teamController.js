@@ -2,44 +2,27 @@ const User = require('../models/User');
 const UserPackage = require('../models/UserPackage');
 const Transaction = require('../models/Transaction');
 
-// Helper: build a query filter that matches referredBy as either an ObjectId or a referralCode string
-const buildReferredByFilter = (userIds, referralCodes) => {
-  const conditions = [];
-  if (userIds.length > 0) conditions.push({ referredBy: { $in: userIds } });
-  if (referralCodes.length > 0) conditions.push({ referredBy: { $in: referralCodes } });
-  if (conditions.length === 0) return null;
-  return { $or: conditions };
-};
-
 // @desc    Get team/referral stats
 // @route   GET /api/team/stats
 // @access  Private
 exports.getTeamStats = async (req, res) => {
   try {
     const userId = req.user._id;
-    const userReferralCode = req.user.referralCode;
 
-    // Find Level 1 referrals (referred by this user's _id OR referralCode)
-    const lvl1Filter = buildReferredByFilter([userId], userReferralCode ? [userReferralCode] : []);
-    const lvl1Users = lvl1Filter ? await User.find(lvl1Filter) : [];
+    // Find Level 1 referrals
+    const lvl1Users = await User.find({ referredBy: userId });
     const lvl1Ids = lvl1Users.map((u) => u._id);
-    const lvl1Codes = lvl1Users.map((u) => u.referralCode).filter(Boolean);
 
     // Find Level 2 referrals
-    const lvl2Filter = buildReferredByFilter(lvl1Ids, lvl1Codes);
-    const lvl2Users = lvl2Filter ? await User.find(lvl2Filter) : [];
+    const lvl2Users = lvl1Ids.length > 0 ? await User.find({ referredBy: { $in: lvl1Ids } }) : [];
     const lvl2Ids = lvl2Users.map((u) => u._id);
-    const lvl2Codes = lvl2Users.map((u) => u.referralCode).filter(Boolean);
 
     // Find Level 3 referrals
-    const lvl3Filter = buildReferredByFilter(lvl2Ids, lvl2Codes);
-    const lvl3Users = lvl3Filter ? await User.find(lvl3Filter) : [];
+    const lvl3Users = lvl2Ids.length > 0 ? await User.find({ referredBy: { $in: lvl2Ids } }) : [];
     const lvl3Ids = lvl3Users.map((u) => u._id);
-    const lvl3Codes = lvl3Users.map((u) => u.referralCode).filter(Boolean);
 
     // Find Level 4 referrals
-    const lvl4Filter = buildReferredByFilter(lvl3Ids, lvl3Codes);
-    const lvl4Users = lvl4Filter ? await User.find(lvl4Filter) : [];
+    const lvl4Users = lvl3Ids.length > 0 ? await User.find({ referredBy: { $in: lvl3Ids } }) : [];
     const lvl4Ids = lvl4Users.map((u) => u._id);
 
     // Get active purchases for team investment calculations (all levels)
@@ -107,15 +90,11 @@ exports.getTeamStats = async (req, res) => {
 exports.getTeamMembers = async (req, res) => {
   try {
     const userId = req.user._id;
-    const userReferralCode = req.user.referralCode;
 
-    // Find referred users (matching either ObjectId or referralCode)
-    const filter = buildReferredByFilter([userId], userReferralCode ? [userReferralCode] : []);
-    const referrals = filter
-      ? await User.find(filter)
-          .select('name email createdAt walletBalance')
-          .sort({ createdAt: -1 })
-      : [];
+    // Find referred users
+    const referrals = await User.find({ referredBy: userId })
+      .select('name email createdAt walletBalance')
+      .sort({ createdAt: -1 });
 
     const referralList = [];
 

@@ -51,7 +51,7 @@ export default function TeamScreen({ navigation }) {
   const getReferralLink = () => {
     if (!user) return '';
     // Provide a standard fallback URL since window.location.origin is web-only
-    return `https://rewardspay.vercel.app/register?ref=${user.referralCode}`;
+    return `https://rewardpay-psi.vercel.app/register?ref=${user.referralCode}`;
   };
 
   const copyReferralLink = async () => {

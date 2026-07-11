@@ -13,13 +13,9 @@ import {
   FaSpinner, 
   FaUpload, 
   FaImage,
-  FaArrowLeft,
   FaWallet,
-  FaCoins,
-  FaUsers,
-  FaUser,
   FaUniversity,
-  FaChevronRight
+  FaQuestionCircle
 } from 'react-icons/fa';
 import './Upi.css';
 
@@ -28,13 +24,11 @@ const Upi = () => {
   const location = useLocation();
   const navigate = useNavigate();
   
-  // View control: 'dashboard' | 'deposit' | 'withdraw' | 'history'
-  const [viewState, setViewState] = useState('dashboard');
+  // Tab control: 'deposit' | 'withdraw'
+  const [activeTab, setActiveTab] = useState('deposit');
   const [loading, setLoading] = useState(true);
   const [txLoading, setTxLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
-  const [deposits, setDeposits] = useState([]);
-  const [withdrawals, setWithdrawals] = useState([]);
   
   // Form states
   const [amount, setAmount] = useState('');
@@ -50,9 +44,6 @@ const Upi = () => {
   const [formError, setFormError] = useState('');
   const [paymentTime, setPaymentTime] = useState('');
 
-  // History Tab control: 'deposit' | 'withdraw'
-  const [historyTab, setHistoryTab] = useState('deposit');
-  
   // Screenshot view modal
   const [activeScreenshot, setActiveScreenshot] = useState(null);
 
@@ -81,23 +72,18 @@ const Upi = () => {
 
   const fetchTransactions = useCallback(async () => {
     try {
-      const [depRes, wdrRes] = await Promise.all([
-        API.get('/wallet/deposits'),
-        API.get('/wallet/withdrawals')
-      ]);
-      if (depRes.data.success) {
-        setDeposits(depRes.data.data);
-      }
-      if (wdrRes.data.success) {
-        setWithdrawals(wdrRes.data.data);
+      const res = await API.get('/wallet/transactions');
+      if (res.data.success) {
+        setTransactions(res.data.data);
       }
       fetchPendingRequests();
+      refreshUser();
     } catch (err) {
       console.error('Error fetching transactions:', err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [refreshUser]);
 
   useEffect(() => {
     fetchTransactions();
@@ -124,7 +110,7 @@ const Upi = () => {
   useEffect(() => {
     if (location.state && location.state.amount) {
       setAmount(location.state.amount.toString());
-      setViewState('deposit');
+      setActiveTab('deposit');
     }
   }, [location.state]);
 
@@ -164,7 +150,6 @@ const Upi = () => {
       return;
     }
 
-    // Screenshot is optional for ease of testing and flexibility
     setTxLoading(true);
     try {
       const res = await API.post('/wallet/deposit', {
@@ -175,8 +160,8 @@ const Upi = () => {
       });
 
       if (res.data.success) {
-        setModalTitle('Deposit Request Submitted Successfully.');
-        setModalMsg(`Your deposit request of ₹${depAmount.toFixed(2)} with UTR: ${utr} has been submitted successfully.\n\nStatus: Pending\n\nOnce approved, your Wallet Balance will update automatically.`);
+        setModalTitle('Deposit Submitted!');
+        setModalMsg(`Your deposit request for ₹${depAmount.toFixed(2)} has been submitted with UTR: ${utr}. It is currently pending verification.`);
         setIsModalOpen(true);
         setAmount('');
         setUtr('');
@@ -239,9 +224,9 @@ const Upi = () => {
       const res = await API.post('/wallet/withdraw', payload);
 
       if (res.data.success) {
-        setModalTitle('Withdrawal Request Submitted Successfully.');
+        setModalTitle('Withdrawal Requested!');
         const displayTarget = withdrawMethod === 'upi' ? `UPI ID: ${withdrawUpi}` : `Bank A/C: ${accountNumber}`;
-        setModalMsg(`A withdrawal request of ₹${wdrAmount.toFixed(2)} to ${displayTarget} has been submitted successfully.\n\nStatus: Pending\n\nAfter admin approval, the amount will be deducted and status will be updated to Paid.`);
+        setModalMsg(`A withdrawal request of ₹${wdrAmount.toFixed(2)} to ${displayTarget} has been submitted successfully and is pending approval.`);
         setIsModalOpen(true);
         setAmount('');
         setWithdrawUpi('');
@@ -346,494 +331,351 @@ const Upi = () => {
 
   return (
     <div className="page-container animate-fade-in">
-      
-      {/* 1. DASHBOARD VIEW */}
-      {viewState === 'dashboard' && (
-        <div className="upi-dashboard-view">
-          <div className="upi-header">
-            <h1>UPI Wallet Dashboard</h1>
-            <p>Manage your account funds, initiate lightning-fast deposits, or request withdrawals securely.</p>
-          </div>
+      <div className="upi-header">
+        <h1>UPI Transactions</h1>
+        <p>Fund your account wallet via UPI scanning, or request rapid withdrawals directly to your banking address.</p>
+      </div>
 
-          <div className="wallet-balance-hero">
-            <GlassCard className="balance-hero-card">
-              <div className="balance-glow"></div>
-              <div className="balance-hero-header">
-                <span className="balance-icon-bg"><FaWallet /></span>
-                <div>
-                  <p className="hero-balance-lbl">Available Wallet Balance</p>
-                  <h2 className="hero-balance-val">₹{user?.walletBalance?.toFixed(2)}</h2>
-                </div>
-              </div>
-            </GlassCard>
-          </div>
-
-          {/* Quick Stats Grid */}
-          <div className="stats-mini-summary" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '24px' }}>
-            <GlassCard className="income-stat-mini">
-              <span className="mini-stat-icon text-emerald"><FaCoins /></span>
-              <div>
-                <p className="mini-stat-label">Today's Profit</p>
-                <h4 className="mini-stat-value text-emerald">+₹{user?.todayEarnings?.toFixed(2) || '0.00'}</h4>
-              </div>
-            </GlassCard>
-            <GlassCard className="income-stat-mini">
-              <span className="mini-stat-icon text-gold"><FaCoins /></span>
-              <div>
-                <p className="mini-stat-label">Total Earnings</p>
-                <h4 className="mini-stat-value text-gold">₹{user?.totalEarnings?.toFixed(2) || '0.00'}</h4>
-              </div>
-            </GlassCard>
-          </div>
-
-          {/* User Flow Dashboard Options */}
-          <h3 className="section-title-wallet">Wallet Operations</h3>
-          <div className="wallet-actions-grid">
-            <GlassCard className="wallet-action-card" interactive={true} onClick={() => setViewState('deposit')}>
-              <div className="action-card-left">
-                <span className="action-circle bg-emerald"><FaPlusCircle /></span>
-                <div>
-                  <h4>Deposit Funds</h4>
-                  <p>Add funds via UPI QR & UTR verification</p>
-                </div>
-              </div>
-              <FaChevronRight className="chevron-icon" />
-            </GlassCard>
-
-            <GlassCard className="wallet-action-card" interactive={true} onClick={() => setViewState('withdraw')}>
-              <div className="action-card-left">
-                <span className="action-circle bg-rose"><FaMinusCircle /></span>
-                <div>
-                  <h4>Withdraw Funds</h4>
-                  <p>Rapid payout to UPI ID or Bank Account</p>
-                </div>
-              </div>
-              <FaChevronRight className="chevron-icon" />
-            </GlassCard>
-
-            <GlassCard className="wallet-action-card" interactive={true} onClick={() => navigate('/team')}>
-              <div className="action-card-left">
-                <span className="action-circle bg-blue"><FaUsers /></span>
-                <div>
-                  <h4>My Team</h4>
-                  <p>Check team earnings and referral structure</p>
-                </div>
-              </div>
-              <FaChevronRight className="chevron-icon" />
-            </GlassCard>
-
-            <GlassCard className="wallet-action-card" interactive={true} onClick={() => navigate('/profile')}>
-              <div className="action-card-left">
-                <span className="action-circle bg-purple"><FaUser /></span>
-                <div>
-                  <h4>My Profile</h4>
-                  <p>View account details and credentials</p>
-                </div>
-              </div>
-              <FaChevronRight className="chevron-icon" />
-            </GlassCard>
-
-            <GlassCard className="wallet-action-card" interactive={true} onClick={() => { setViewState('history'); setHistoryTab('deposit'); }}>
-              <div className="action-card-left">
-                <span className="action-circle bg-yellow"><FaHistory /></span>
-                <div>
-                  <h4>Recharge History</h4>
-                  <p>Check all your previous deposit requests</p>
-                </div>
-              </div>
-              <FaChevronRight className="chevron-icon" />
-            </GlassCard>
-
-            <GlassCard className="wallet-action-card" interactive={true} onClick={() => { setViewState('history'); setHistoryTab('withdraw'); }}>
-              <div className="action-card-left">
-                <span className="action-circle bg-orange"><FaHistory /></span>
-                <div>
-                  <h4>Withdraw History</h4>
-                  <p>Check your withdrawals and bank transfers</p>
-                </div>
-              </div>
-              <FaChevronRight className="chevron-icon" />
-            </GlassCard>
-          </div>
-        </div>
-      )}
-
-      {/* 2. DEPOSIT FLOW */}
-      {viewState === 'deposit' && (
-        <div className="upi-deposit-view animate-fade-in">
-          <div className="view-navigation-header">
-            <button className="back-to-dashboard-btn" onClick={() => setViewState('dashboard')}>
-              <FaArrowLeft /> Back to Wallet Dashboard
+      <div className="upi-main-container">
+        <GlassCard className="upi-card">
+          {/* Tab Header */}
+          <div className="upi-tabs">
+            <button
+              className={`upi-tab-btn ${activeTab === 'deposit' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('deposit');
+                setFormError('');
+                setAmount('');
+                setUtr('');
+                setScreenshot('');
+                setScreenshotPreview('');
+                setPaymentTime('');
+              }}
+            >
+              <FaPlusCircle /> Deposit Funds
+            </button>
+            <button
+              className={`upi-tab-btn ${activeTab === 'withdraw' ? 'active' : ''}`}
+              onClick={() => {
+                setActiveTab('withdraw');
+                setFormError('');
+                setAmount('');
+                setWithdrawUpi('');
+                setBankName('');
+                setBankUserName('');
+                setAccountNumber('');
+                setIfscCode('');
+              }}
+            >
+              <FaMinusCircle /> Withdraw Funds
             </button>
           </div>
 
-          <div className="upi-header" style={{ marginTop: '16px' }}>
-            <h1>Deposit Funds</h1>
-            <p>Scan the merchant QR code, complete payment on your UPI app, and fill details below.</p>
-          </div>
+          {formError && <div className="upi-form-error animate-fade-in">{formError}</div>}
 
-          <div className="upi-main-container">
-            <GlassCard className="upi-card">
-              <div className="deposit-layout animate-fade-in">
-                <div className="deposit-grid">
-                  
-                  {/* QR / Scan payment column */}
-                  <div className="deposit-qr-column">
-                    <div className="qr-box-wrapper">
-                      <h4>UPI Payment</h4>
-                      <p className="qr-subtext">Scan or copy the merchant details below to complete your payment.</p>
-                      
-                      <div style={{ margin: '15px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
-                        <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Amount to Transfer</span>
-                        <span style={{ fontSize: '32px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
-                      </div>
+          {/* Deposit Layout */}
+          {activeTab === 'deposit' && (
+            <div className="deposit-layout animate-fade-in">
+              <div className="deposit-grid">
+                
+                {/* Scan and Pay Column */}
+                <div className="deposit-qr-column">
+                  <div className="qr-box-wrapper">
+                    <h4>UPI Payment</h4>
+                    <p className="qr-subtext">Scan or copy the merchant details below to complete your payment.</p>
+                    
+                    <div style={{ margin: '15px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
+                      <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Amount to Transfer</span>
+                      <span style={{ fontSize: '32px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
+                    </div>
 
-                      <div className="merchant-address-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
-                        <span className="merchant-lbl">Merchant Name: <strong style={{ color: '#ffffff' }}>Akula kesava</strong></span>
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
-                          <span className="merchant-lbl">Merchant UPI: <strong>kesavaroyal117-1@okicici</strong></span>
-                          <button type="button" onClick={copyUpiAddress} className="copy-btn-mini">
-                            <FaCopy /> {copied ? 'Copied' : 'Copy'}
-                          </button>
-                        </div>
+                    <div className="merchant-address-box" style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', width: '100%', boxSizing: 'border-box' }}>
+                      <span className="merchant-lbl">Merchant Name: <strong style={{ color: '#ffffff' }}>Akula kesava</strong></span>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', width: '100%' }}>
+                        <span className="merchant-lbl">Merchant UPI: <strong>kesavaroyal117-1@okicici</strong></span>
+                        <button type="button" onClick={copyUpiAddress} className="copy-btn-mini">
+                          <FaCopy /> {copied ? 'Copied' : 'Copy'}
+                        </button>
                       </div>
                     </div>
                   </div>
+                </div>
 
-                  {/* Form Details column */}
-                  <div className="deposit-form-column">
-                    {formError && <div className="upi-form-error animate-fade-in">{formError}</div>}
+                {/* Verification details Column */}
+                <div className="deposit-form-column">
+                  <form onSubmit={handleDepositSubmit} className="upi-form">
                     
-                    <form onSubmit={handleDepositSubmit} className="upi-form">
+                    <div className="upi-input-group">
+                      <label htmlFor="amount">Deposit Amount (₹)</label>
+                      <input
+                        id="amount"
+                        type="number"
+                        min="1"
+                        className="input-field"
+                        placeholder="Enter paid amount (e.g. 500)"
+                        value={amount}
+                        onChange={(e) => setAmount(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="upi-input-group">
+                      <label htmlFor="utr">UTR Number / Transaction ID (12 Digits)</label>
+                      <input
+                        id="utr"
+                        type="text"
+                        maxLength="12"
+                        className="input-field"
+                        placeholder="Enter 12-digit UTR code"
+                        value={utr}
+                        onChange={(e) => setUtr(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="upi-input-group">
+                      <label htmlFor="paymentTime">Payment Time</label>
+                      <input
+                        id="paymentTime"
+                        type="datetime-local"
+                        className="input-field"
+                        value={paymentTime}
+                        onChange={(e) => setPaymentTime(e.target.value)}
+                        required
+                      />
+                    </div>
+
+                    <div className="upi-input-group">
+                      <label>Screenshot Upload</label>
+                      <div className="screenshot-upload-zone">
+                        <input
+                          id="screenshot-input"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleFileChange}
+                          style={{ display: 'none' }}
+                        />
+                        <label htmlFor="screenshot-input" className="upload-label">
+                          <FaUpload className="upload-icon" />
+                          <span>{screenshot ? 'Change Screenshot' : 'Upload Payment Screenshot'}</span>
+                        </label>
+                      </div>
                       
-                      <div className="upi-input-group">
-                        <label htmlFor="amount">Deposit Amount (₹)</label>
-                        <input
-                          id="amount"
-                          type="number"
-                          min="1"
-                          className="input-field"
-                          placeholder="Enter paid amount (e.g. 500)"
-                          value={amount}
-                          onChange={(e) => setAmount(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div className="upi-input-group">
-                        <label htmlFor="utr">UTR Number / Transaction ID (12 Digits)</label>
-                        <input
-                          id="utr"
-                          type="text"
-                          maxLength="12"
-                          className="input-field"
-                          placeholder="Enter 12-digit UTR code"
-                          value={utr}
-                          onChange={(e) => setUtr(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div className="upi-input-group">
-                        <label htmlFor="paymentTime">Payment Time</label>
-                        <input
-                          id="paymentTime"
-                          type="datetime-local"
-                          className="input-field"
-                          value={paymentTime}
-                          onChange={(e) => setPaymentTime(e.target.value)}
-                          required
-                        />
-                      </div>
-
-                      <div className="upi-input-group">
-                        <label>Screenshot Upload</label>
-                        <div className="screenshot-upload-zone">
-                          <input
-                            id="screenshot-input"
-                            type="file"
-                            accept="image/*"
-                            onChange={handleFileChange}
-                            style={{ display: 'none' }}
-                          />
-                          <label htmlFor="screenshot-input" className="upload-label">
-                            <FaUpload className="upload-icon" />
-                            <span>{screenshot ? 'Change Screenshot' : 'Upload Payment Screenshot'}</span>
-                          </label>
+                      {screenshotPreview && (
+                        <div className="screenshot-preview-container animate-fade-in">
+                          <img src={screenshotPreview} alt="Screenshot Preview" className="screenshot-preview" />
+                          <span className="preview-lbl"><FaImage /> Preview Loaded</span>
                         </div>
-                        
-                        {screenshotPreview && (
-                          <div className="screenshot-preview-container animate-fade-in">
-                            <img src={screenshotPreview} alt="Screenshot Preview" className="screenshot-preview" />
-                            <span className="preview-lbl"><FaImage /> Preview Loaded</span>
-                          </div>
-                        )}
-                      </div>
+                      )}
+                    </div>
 
-                      <div className="submit-action-container">
-                        <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading}>
-                          {txLoading ? <FaSpinner className="spin" /> : 'Submit Deposit'}
-                        </button>
-                      </div>
+                    <div className="submit-action-container">
+                      <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading}>
+                        {txLoading ? <FaSpinner className="spin" /> : 'Submit Deposit'}
+                      </button>
+                    </div>
 
-                      <div className="deposit-guidelines-box animate-fade-in" style={{ marginTop: '16px' }}>
-                        <h5>Deposit Guidelines</h5>
-                        <ul>
-                          <li>1. Copy the UPI ID: <strong>kesavaroyal117-1@okicici</strong>.</li>
-                          <li>2. Complete the payment via PhonePe, Paytm, GooglePay, etc.</li>
-                          <li>3. Copy the 12-digit UTR / Reference ID from transaction history.</li>
-                          <li>4. Take a screenshot of the successful payment.</li>
-                          <li>5. Paste the UTR, upload the screenshot, specify the time, and click Submit.</li>
-                        </ul>
-                      </div>
-                    </form>
-                  </div>
+                    <div className="deposit-guidelines-box animate-fade-in" style={{ marginTop: '16px' }}>
+                      <h5>Deposit Guidelines</h5>
+                      <ul>
+                        <li>1. Copy the UPI ID: <strong>kesavaroyal117-1@okicici</strong>.</li>
+                        <li>2. Complete the payment via PhonePe, Paytm, GooglePay, etc.</li>
+                        <li>3. Copy the 12-digit UTR / Reference ID from transaction history.</li>
+                        <li>4. Take a screenshot of the successful payment.</li>
+                        <li>5. Paste the UTR, upload the screenshot, specify the time, and click Submit.</li>
+                      </ul>
+                    </div>
+                  </form>
                 </div>
               </div>
-            </GlassCard>
-          </div>
-        </div>
-      )}
+            </div>
+          )}
 
-      {/* 3. WITHDRAW FLOW */}
-      {viewState === 'withdraw' && (
-        <div className="upi-withdraw-view animate-fade-in">
-          <div className="view-navigation-header">
-            <button className="back-to-dashboard-btn" onClick={() => setViewState('dashboard')}>
-              <FaArrowLeft /> Back to Wallet Dashboard
-            </button>
-          </div>
+          {/* Withdraw Layout */}
+          {activeTab === 'withdraw' && (
+            <form onSubmit={handleWithdrawSubmit} className="upi-form animate-fade-in">
+              <div className="withdraw-balance-bar">
+                <span>Available Balance:</span>
+                <strong>₹{user?.walletBalance?.toFixed(2)}</strong>
+              </div>
 
-          <div className="upi-header" style={{ marginTop: '16px' }}>
-            <h1>Withdraw Funds</h1>
-            <p>Withdraw your available balance directly to your UPI ID or Bank account.</p>
-          </div>
-
-          <div className="upi-main-container">
-            <GlassCard className="upi-card">
-              <form onSubmit={handleWithdrawSubmit} className="upi-form animate-fade-in">
-                <div className="withdraw-balance-bar">
-                  <span>Available Balance:</span>
-                  <strong>₹{user?.walletBalance?.toFixed(2)}</strong>
+              <div className="upi-input-group">
+                <label>Select Withdrawal Mode</label>
+                <div className="upi-tabs" style={{ marginBottom: 0, padding: '4px' }}>
+                  <button
+                    type="button"
+                    className={`upi-tab-btn ${withdrawMethod === 'upi' ? 'active' : ''}`}
+                    onClick={() => {
+                      setWithdrawMethod('upi');
+                      setFormError('');
+                    }}
+                  >
+                    <FaWallet /> UPI ID
+                  </button>
+                  <button
+                    type="button"
+                    className={`upi-tab-btn ${withdrawMethod === 'bank' ? 'active' : ''}`}
+                    onClick={() => {
+                      setWithdrawMethod('bank');
+                      setFormError('');
+                    }}
+                  >
+                    <FaUniversity /> Bank Transfer
+                  </button>
                 </div>
+              </div>
 
-                <div className="upi-input-group">
-                  <label>Select Withdraw Method</label>
-                  <div className="upi-tabs" style={{ marginBottom: 0, padding: '4px' }}>
-                    <button
-                      type="button"
-                      className={`upi-tab-btn ${withdrawMethod === 'upi' ? 'active' : ''}`}
-                      onClick={() => {
-                        setWithdrawMethod('upi');
-                        setFormError('');
-                      }}
-                    >
-                      <FaWallet /> UPI ID
-                    </button>
-                    <button
-                      type="button"
-                      className={`upi-tab-btn ${withdrawMethod === 'bank' ? 'active' : ''}`}
-                      onClick={() => {
-                        setWithdrawMethod('bank');
-                        setFormError('');
-                      }}
-                    >
-                      <FaUniversity /> Bank Account
-                    </button>
-                  </div>
-                </div>
+              <div className="upi-input-group">
+                <label htmlFor="amount">Withdrawal Amount (₹)</label>
+                <input
+                  id="amount"
+                  type="number"
+                  min="300"
+                  className="input-field"
+                  placeholder="Minimum ₹300"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.value)}
+                  required
+                />
+                <span className="input-hint" style={{ color: 'var(--text-secondary)', fontSize: '11px', marginTop: '4px' }}>
+                  Limit: ₹300 Minimum
+                </span>
+              </div>
 
-                {formError && <div className="upi-form-error animate-fade-in">{formError}</div>}
-
-                <div className="upi-input-group">
-                  <label htmlFor="amount">Enter Amount (₹)</label>
+              {withdrawMethod === 'upi' ? (
+                <div className="upi-input-group animate-fade-in">
+                  <label htmlFor="withdrawUpi">Your Target UPI ID</label>
                   <input
-                    id="amount"
-                    type="number"
-                    min="300"
+                    id="withdrawUpi"
+                    type="text"
                     className="input-field"
-                    placeholder="Minimum ₹300"
-                    value={amount}
-                    onChange={(e) => setAmount(e.target.value)}
+                    placeholder="yourname@okaxis"
+                    value={withdrawUpi}
+                    onChange={(e) => setWithdrawUpi(e.target.value)}
                     required
                   />
-                  <span className="input-hint" style={{ color: 'var(--text-secondary)', fontSize: '11px', marginTop: '4px' }}>
-                    Minimum Withdraw amount is ₹300
-                  </span>
                 </div>
-
-                {withdrawMethod === 'upi' ? (
-                  <div className="upi-input-group animate-fade-in">
-                    <label htmlFor="withdrawUpi">UPI ID</label>
+              ) : (
+                <div className="bank-inputs-container animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+                  <div className="upi-input-group">
+                    <label htmlFor="bankUserName">Bank Account Holder Name</label>
                     <input
-                      id="withdrawUpi"
+                      id="bankUserName"
                       type="text"
                       className="input-field"
-                      placeholder="yourupiid@okaxis"
-                      value={withdrawUpi}
-                      onChange={(e) => setWithdrawUpi(e.target.value)}
+                      placeholder="Enter account holder's name"
+                      value={bankUserName}
+                      onChange={(e) => setBankUserName(e.target.value)}
                       required
                     />
                   </div>
-                ) : (
-                  <div className="bank-inputs-container animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-                    <div className="upi-input-group">
-                      <label htmlFor="bankUserName">Account Holder Name</label>
-                      <input
-                        id="bankUserName"
-                        type="text"
-                        className="input-field"
-                        placeholder="Enter bank account holder's name"
-                        value={bankUserName}
-                        onChange={(e) => setBankUserName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="upi-input-group">
-                      <label htmlFor="bankName">Bank Name</label>
-                      <input
-                        id="bankName"
-                        type="text"
-                        className="input-field"
-                        placeholder="Enter bank name (e.g. State Bank of India)"
-                        value={bankName}
-                        onChange={(e) => setBankName(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="upi-input-group">
-                      <label htmlFor="accountNumber">Account Number</label>
-                      <input
-                        id="accountNumber"
-                        type="text"
-                        className="input-field"
-                        placeholder="Enter bank account number"
-                        value={accountNumber}
-                        onChange={(e) => setAccountNumber(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="upi-input-group">
-                      <label htmlFor="ifscCode">IFSC Code</label>
-                      <input
-                        id="ifscCode"
-                        type="text"
-                        className="input-field"
-                        placeholder="Enter bank IFSC (e.g. SBIN0001234)"
-                        value={ifscCode}
-                        onChange={(e) => setIfscCode(e.target.value)}
-                        required
-                      />
+                  <div className="upi-input-group">
+                    <label htmlFor="bankName">Bank Name</label>
+                    <input
+                      id="bankName"
+                      type="text"
+                      className="input-field"
+                      placeholder="Enter bank name (e.g. State Bank of India)"
+                      value={bankName}
+                      onChange={(e) => setBankName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="upi-input-group">
+                    <label htmlFor="accountNumber">Bank Account Number</label>
+                    <input
+                      id="accountNumber"
+                      type="text"
+                      className="input-field"
+                      placeholder="Enter bank account number"
+                      value={accountNumber}
+                      onChange={(e) => setAccountNumber(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div className="upi-input-group">
+                    <label htmlFor="ifscCode">Bank IFSC Code</label>
+                    <input
+                      id="ifscCode"
+                      type="text"
+                      className="input-field"
+                      placeholder="Enter bank IFSC (e.g. SBIN0001234)"
+                      value={ifscCode}
+                      onChange={(e) => setIfscCode(e.target.value)}
+                      required
+                    />
+                  </div>
+                </div>
+              )}
+
+              <div className="submit-action-container">
+                <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading}>
+                  {txLoading ? <FaSpinner className="spin" /> : 'Submit Withdrawal Request'}
+                </button>
+              </div>
+            </form>
+          )}
+        </GlassCard>
+      </div>
+
+      {/* Transaction History Section */}
+      <div className="upi-history-section">
+        <GlassCard className="upi-history-card">
+          <div className="history-header">
+            <h4><FaHistory /> Wallet Transaction Logs</h4>
+          </div>
+
+          <div className="history-list">
+            {transactions.length === 0 ? (
+              <div className="no-history-text">
+                <p>No transaction history logged.</p>
+              </div>
+            ) : (
+              transactions.map((tx) => (
+                <div key={tx._id} className="history-row animate-fade-in">
+                  <div className="history-row-left">
+                    <div className={`type-badge badge-${tx.type}`}>{tx.type}</div>
+                    <div className="history-info">
+                      <p className="history-desc">{tx.description}</p>
+                      <span className="history-time">{new Date(tx.createdAt).toLocaleString()}</span>
+                      {tx.utr && <span className="history-utr-text">UTR: {tx.utr}</span>}
+                      {tx.paymentTime && <span className="history-utr-text">Payment Time: {new Date(tx.paymentTime).toLocaleString()}</span>}
+                      {tx.screenshot && (
+                        <button
+                          type="button"
+                          className="view-screenshot-inline-btn"
+                          onClick={() => setActiveScreenshot({ url: tx.screenshot, utr: tx.utr })}
+                        >
+                          <FaImage /> View Screenshot
+                        </button>
+                      )}
+                      {tx.adminRemark && (
+                        <div className="admin-remark-box" style={{ marginTop: '8px', fontSize: '12.5px', color: '#f59e0b', borderLeft: '2px solid #f59e0b', paddingLeft: '8px', textAlign: 'left' }}>
+                          <span style={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Admin Remark:</span>
+                          {tx.adminRemark}
+                        </div>
+                      )}
                     </div>
                   </div>
-                )}
-
-                <div className="submit-action-container" style={{ marginTop: '8px' }}>
-                  <button type="submit" className="btn-primary upi-submit-btn" disabled={txLoading}>
-                    {txLoading ? <FaSpinner className="spin" /> : 'Submit Withdraw Request'}
-                  </button>
-                </div>
-              </form>
-            </GlassCard>
-          </div>
-        </div>
-      )}
-
-      {/* 4. TRANSACTION HISTORY VIEW */}
-      {viewState === 'history' && (
-        <div className="upi-history-view animate-fade-in">
-          <div className="view-navigation-header">
-            <button className="back-to-dashboard-btn" onClick={() => setViewState('dashboard')}>
-              <FaArrowLeft /> Back to Wallet Dashboard
-            </button>
-          </div>
-
-          <div className="upi-header" style={{ marginTop: '16px' }}>
-            <h1>Transaction History</h1>
-            <p>Review the logs and current status of your deposits and withdrawals.</p>
-          </div>
-
-          <div className="upi-history-section">
-            <GlassCard className="upi-history-card">
-              <div className="history-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '16px', marginBottom: '20px' }}>
-                <h4 style={{ margin: 0 }}><FaHistory /> Logs</h4>
-                
-                <div className="upi-tabs" style={{ margin: 0, padding: '2px', height: '36px', minWidth: '240px' }}>
-                  <button
-                    type="button"
-                    className={`upi-tab-btn ${historyTab === 'deposit' ? 'active' : ''}`}
-                    style={{ padding: '6px 12px', fontSize: '13px' }}
-                    onClick={() => setHistoryTab('deposit')}
-                  >
-                    Deposit History
-                  </button>
-                  <button
-                    type="button"
-                    className={`upi-tab-btn ${historyTab === 'withdraw' ? 'active' : ''}`}
-                    style={{ padding: '6px 12px', fontSize: '13px' }}
-                    onClick={() => setHistoryTab('withdraw')}
-                  >
-                    Withdraw History
-                  </button>
-                </div>
-              </div>
-
-              <div className="history-list">
-                {(historyTab === 'deposit' ? deposits : withdrawals).length === 0 ? (
-                  <div className="no-history-text">
-                    <p>No transactions logged.</p>
-                  </div>
-                ) : (
-                  (historyTab === 'deposit' ? deposits : withdrawals).map((tx) => (
-                    <div key={tx._id} className="history-row animate-fade-in">
-                      <div className="history-row-left">
-                        <div className={`type-badge badge-${tx.type}`}>{tx.type}</div>
-                        <div className="history-info">
-                          <p className="history-desc">{tx.description}</p>
-                          <span className="history-time">{new Date(tx.createdAt).toLocaleString()}</span>
-                          {tx.utr && <span className="history-utr-text">UTR: {tx.utr}</span>}
-                          {tx.paymentTime && <span className="history-utr-text">Payment Time: {new Date(tx.paymentTime).toLocaleString()}</span>}
-                          {tx.screenshot && (
-                            <button
-                              type="button"
-                              className="view-screenshot-inline-btn"
-                              onClick={() => setActiveScreenshot({ url: tx.screenshot, utr: tx.utr })}
-                            >
-                              <FaImage /> View Screenshot
-                            </button>
-                          )}
-                          {tx.adminRemark && (
-                            <div className="admin-remark-box" style={{ marginTop: '8px', fontSize: '12.5px', color: '#f59e0b', borderLeft: '2px solid #f59e0b', paddingLeft: '8px', textAlign: 'left' }}>
-                              <span style={{ fontSize: '10px', fontWeight: '800', textTransform: 'uppercase', color: 'var(--text-secondary)', display: 'block', marginBottom: '2px' }}>Admin Remark:</span>
-                              {tx.adminRemark}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      <div className="history-row-right">
-                        <span className={`history-amount ${tx.type === 'deposit' || tx.type === 'reward' || tx.type === 'referral' ? 'pos' : 'neg'}`}>
-                          {tx.type === 'deposit' || tx.type === 'reward' || tx.type === 'referral' ? '+' : '-'}₹{tx.amount?.toFixed(2)}
-                        </span>
-                        <div className="status-container">
-                          <span className={`status-pill ${getStatusClass(tx.status)}`}>{tx.status}</span>
-                        </div>
-                      </div>
+                  <div className="history-row-right">
+                    <span className={`history-amount ${tx.type === 'deposit' || tx.type === 'reward' || tx.type === 'referral' ? 'pos' : 'neg'}`}>
+                      {tx.type === 'deposit' || tx.type === 'reward' || tx.type === 'referral' ? '+' : '-'}₹{tx.amount?.toFixed(2)}
+                    </span>
+                    <div className="status-container">
+                      <span className={`status-pill ${getStatusClass(tx.status)}`}>{tx.status}</span>
                     </div>
-                  ))
-                )}
-              </div>
-            </GlassCard>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
-        </div>
-      )}
+        </GlassCard>
+      </div>
 
       {/* Success Payout Modal */}
       <SuccessModal
         isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setViewState('dashboard');
-        }}
+        onClose={() => setIsModalOpen(false)}
         title={modalTitle}
         message={modalMsg}
       />

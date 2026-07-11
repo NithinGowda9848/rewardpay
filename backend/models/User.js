@@ -60,7 +60,8 @@ const UserSchema = new mongoose.Schema(
       unique: true,
     },
     referredBy: {
-      type: mongoose.Schema.Types.Mixed,
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User',
       default: null,
     },
     role: {
