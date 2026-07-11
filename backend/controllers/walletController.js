@@ -200,13 +200,63 @@ exports.getTransactions = async (req, res) => {
     // Refresh earnings to show latest reward transactions if any
     await collectEarnings(req.user._id);
 
-    const transactions = await Transaction.find({ userId: req.user._id })
-      .sort({ createdAt: -1 })
-      .limit(50);
+    const [deposits, withdrawals, otherTransactions] = await Promise.all([
+      Deposit.find({ $or: [{ user: req.user._id }, { userId: req.user._id }] }),
+      Withdrawal.find({ $or: [{ user: req.user._id }, { userId: req.user._id }] }),
+      Transaction.find({ userId: req.user._id, type: { $in: ['reward', 'referral', 'purchase'] } })
+    ]);
+
+    const formattedDeposits = deposits.map(d => ({
+      _id: d._id,
+      amount: d.amount,
+      status: d.status,
+      utr: d.utrNumber,
+      paymentTime: d.paymentTime,
+      adminRemark: d.adminRemark,
+      screenshot: d.screenshot,
+      type: 'deposit',
+      flow: 'in',
+      description: `Deposit via UPI (UTR: ${d.utrNumber})`,
+      createdAt: d.createdAt,
+    }));
+
+    const formattedWithdrawals = withdrawals.map(w => {
+      let description = '';
+      if (w.withdrawMethod === 'upi') {
+        description = `Withdrawal to UPI: ${w.upiId}`;
+      } else {
+        description = `Withdrawal to Bank: ${w.bankName} - Name: ${w.bankUserName}, A/C: ${w.accountNumber}, IFSC: ${w.ifscCode}`;
+      }
+      return {
+        _id: w._id,
+        amount: w.amount,
+        status: w.status,
+        adminRemark: w.adminRemark,
+        type: 'withdraw',
+        flow: 'out',
+        description,
+        createdAt: w.createdAt,
+      };
+    });
+
+    const formattedOthers = otherTransactions.map(tx => ({
+      _id: tx._id,
+      amount: tx.amount,
+      status: tx.status,
+      adminRemark: tx.adminRemark,
+      type: tx.type,
+      flow: tx.type === 'purchase' ? 'out' : 'in',
+      description: tx.description,
+      createdAt: tx.createdAt,
+    }));
+
+    const combined = [...formattedDeposits, ...formattedWithdrawals, ...formattedOthers].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    );
 
     res.status(200).json({
       success: true,
-      data: transactions,
+      data: combined,
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });

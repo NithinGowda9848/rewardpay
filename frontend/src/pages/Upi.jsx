@@ -5,13 +5,13 @@ import API from '../services/api';
 import GlassCard from '../components/GlassCard';
 import SuccessModal from '../components/SuccessModal';
 import LoadingSkeleton from '../components/LoadingSkeleton';
-import { 
-  FaPlusCircle, 
-  FaMinusCircle, 
-  FaHistory, 
-  FaCopy, 
-  FaSpinner, 
-  FaUpload, 
+import {
+  FaPlusCircle,
+  FaMinusCircle,
+  FaHistory,
+  FaCopy,
+  FaSpinner,
+  FaUpload,
   FaImage,
   FaWallet,
   FaUniversity,
@@ -23,13 +23,13 @@ const Upi = () => {
   const { user, refreshUser, socket } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
-  
+
   // Tab control: 'deposit' | 'withdraw'
   const [activeTab, setActiveTab] = useState('deposit');
   const [loading, setLoading] = useState(true);
   const [txLoading, setTxLoading] = useState(false);
   const [transactions, setTransactions] = useState([]);
-  
+
   // Form states
   const [amount, setAmount] = useState('');
   const [utr, setUtr] = useState('');
@@ -257,13 +257,13 @@ const Upi = () => {
   const handleAdminApprove = async (id, type) => {
     setSimLoading(true);
     try {
-      const endpoint = type === 'deposit' 
+      const endpoint = type === 'deposit'
         ? `/wallet/admin/confirm-deposit/${id}`
         : `/wallet/admin/confirm-withdrawal/${id}`;
-      
+
       const remark = simulationRemark[id] || '';
       const res = await API.post(endpoint, { adminRemark: remark });
-      
+
       if (res.data.success) {
         setSimulationRemark(prev => {
           const next = { ...prev };
@@ -288,12 +288,12 @@ const Upi = () => {
     }
     setSimLoading(true);
     try {
-      const endpoint = type === 'deposit' 
+      const endpoint = type === 'deposit'
         ? `/wallet/admin/reject-deposit/${id}`
         : `/wallet/admin/reject-withdrawal/${id}`;
-      
+
       const res = await API.post(endpoint, { adminRemark: remark });
-      
+
       if (res.data.success) {
         setSimulationRemark(prev => {
           const next = { ...prev };
@@ -390,13 +390,13 @@ const Upi = () => {
           {activeTab === 'deposit' && (
             <div className="deposit-layout animate-fade-in">
               <div className="deposit-grid">
-                
+
                 {/* Scan and Pay Column */}
                 <div className="deposit-qr-column">
                   <div className="qr-box-wrapper">
                     <h4>UPI Payment</h4>
                     <p className="qr-subtext">Scan or copy the merchant details below to complete your payment.</p>
-                    
+
                     <div style={{ margin: '15px 0', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px' }}>
                       <span style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Amount to Transfer</span>
                       <span style={{ fontSize: '32px', fontWeight: '800', color: '#ffffff' }}>₹{parseFloat(amount) || 0}</span>
@@ -417,7 +417,7 @@ const Upi = () => {
                 {/* Verification details Column */}
                 <div className="deposit-form-column">
                   <form onSubmit={handleDepositSubmit} className="upi-form">
-                    
+
                     <div className="upi-input-group">
                       <label htmlFor="amount">Deposit Amount (₹)</label>
                       <input
@@ -473,7 +473,7 @@ const Upi = () => {
                           <span>{screenshot ? 'Change Screenshot' : 'Upload Payment Screenshot'}</span>
                         </label>
                       </div>
-                      
+
                       {screenshotPreview && (
                         <div className="screenshot-preview-container animate-fade-in">
                           <img src={screenshotPreview} alt="Screenshot Preview" className="screenshot-preview" />
@@ -784,7 +784,7 @@ const Upi = () => {
           >
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255,255,255,0.08)', paddingBottom: '16px' }}>
               <h3 style={{ margin: 0, color: '#ffffff' }}>🛠️ Admin Simulation</h3>
-              <button 
+              <button
                 onClick={() => setShowSimulator(false)}
                 style={{ background: 'transparent', border: 'none', color: '#a0aec0', fontSize: '20px', cursor: 'pointer' }}
               >
@@ -803,7 +803,7 @@ const Upi = () => {
                 </div>
               ) : (
                 pendingRequests.map((req) => (
-                  <div 
+                  <div
                     key={req._id}
                     style={{
                       background: 'rgba(255, 255, 255, 0.02)',
@@ -848,7 +848,7 @@ const Upi = () => {
                     </div>
 
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                      <input 
+                      <input
                         type="text"
                         className="input-field"
                         style={{ padding: '8px 12px', fontSize: '12px', height: '36px' }}
