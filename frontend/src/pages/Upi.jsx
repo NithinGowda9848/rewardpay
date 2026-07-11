@@ -72,15 +72,9 @@ const Upi = () => {
 
   const fetchTransactions = useCallback(async () => {
     try {
-      const [depRes, wdrRes] = await Promise.all([
-        API.get('/wallet/deposits'),
-        API.get('/wallet/withdrawals')
-      ]);
-      if (depRes.data.success && wdrRes.data.success) {
-        const combined = [...depRes.data.data, ...wdrRes.data.data].sort(
-          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
-        );
-        setTransactions(combined);
+      const res = await API.get('/wallet/transactions');
+      if (res.data.success) {
+        setTransactions(res.data.data);
       }
       fetchPendingRequests();
       refreshUser();
@@ -257,7 +251,7 @@ const Upi = () => {
   const handleAdminApprove = async (id, type) => {
     setSimLoading(true);
     try {
-      const endpoint = type === 'deposit'
+      const endpoint = type?.toLowerCase() === 'deposit'
         ? `/wallet/admin/confirm-deposit/${id}`
         : `/wallet/admin/confirm-withdrawal/${id}`;
 
@@ -288,7 +282,7 @@ const Upi = () => {
     }
     setSimLoading(true);
     try {
-      const endpoint = type === 'deposit'
+      const endpoint = type?.toLowerCase() === 'deposit'
         ? `/wallet/admin/reject-deposit/${id}`
         : `/wallet/admin/reject-withdrawal/${id}`;
 
@@ -671,8 +665,8 @@ const Upi = () => {
                     </div>
                   </div>
                   <div className="history-row-right">
-                    <span className={`history-amount ${tx.type === 'deposit' || tx.type === 'reward' || tx.type === 'referral' ? 'pos' : 'neg'}`}>
-                      {tx.type === 'deposit' || tx.type === 'reward' || tx.type === 'referral' ? '+' : '-'}₹{tx.amount?.toFixed(2)}
+                    <span className={`history-amount ${tx.type?.toLowerCase() === 'deposit' || tx.type?.toLowerCase() === 'reward' || tx.type?.toLowerCase() === 'referral' ? 'pos' : 'neg'}`}>
+                      {tx.type?.toLowerCase() === 'deposit' || tx.type?.toLowerCase() === 'reward' || tx.type?.toLowerCase() === 'referral' ? '+' : '-'}₹{tx.amount?.toFixed(2)}
                     </span>
                     <div className="status-container">
                       <span className={`status-pill ${getStatusClass(tx.status)}`}>{tx.status}</span>

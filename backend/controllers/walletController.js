@@ -216,7 +216,7 @@ exports.getTransactions = async (req, res) => {
       type: 'Deposit',
       flow: 'in',
       description: `Deposit via UPI (UTR: ${d.utrNumber})`,
-      createdAt: d.createdAt,
+      createdAt: d.createdAt || d.date,
     }));
 
     const formattedWithdrawals = withdrawals.map(w => {
@@ -234,7 +234,7 @@ exports.getTransactions = async (req, res) => {
         type: 'Withdrawal',
         flow: 'out',
         description,
-        createdAt: w.createdAt,
+        createdAt: w.createdAt || w.requestDate,
       };
     });
 
@@ -426,7 +426,8 @@ exports.adminConfirmDeposit = async (req, res) => {
     }
 
     // Update depositor's wallet balance
-    const userObj = deposit ? (deposit.user || deposit.userId) : await User.findById(transaction.userId);
+    const targetUserId = deposit ? (deposit.user?._id || deposit.user || deposit.userId?._id || deposit.userId) : transaction.userId;
+    const userObj = await User.findById(targetUserId);
     if (!userObj) {
       return res.status(404).json({ success: false, message: 'Depositing user not found' });
     }
@@ -623,7 +624,8 @@ exports.adminConfirmWithdrawal = async (req, res) => {
       return res.status(400).json({ success: false, message: `Withdrawal request is already ${currentStatus.toLowerCase()}` });
     }
 
-    const userObj = withdrawal ? (withdrawal.user || withdrawal.userId) : await User.findById(transaction.userId);
+    const targetUserId = withdrawal ? (withdrawal.user?._id || withdrawal.user || withdrawal.userId?._id || withdrawal.userId) : transaction.userId;
+    const userObj = await User.findById(targetUserId);
     if (!userObj) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
@@ -810,7 +812,7 @@ exports.getUserDeposits = async (req, res) => {
       type: 'deposit',
       flow: 'in',
       description: `Deposit via UPI (UTR: ${d.utrNumber})`,
-      createdAt: d.createdAt,
+      createdAt: d.createdAt || d.date,
     }));
     res.status(200).json({
       success: true,
@@ -844,7 +846,7 @@ exports.getUserWithdrawals = async (req, res) => {
         type: 'withdraw',
         flow: 'out',
         description,
-        createdAt: w.createdAt,
+        createdAt: w.createdAt || w.requestDate,
       };
     });
     res.status(200).json({
