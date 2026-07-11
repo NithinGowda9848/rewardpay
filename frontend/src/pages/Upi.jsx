@@ -318,6 +318,13 @@ const Upi = () => {
     return 'pending';
   };
 
+  const getTransactionTypeLabel = (type) => {
+    const t = type ? type.toLowerCase() : '';
+    if (t === 'deposit') return 'deposits';
+    if (t === 'withdraw') return 'withdrawl';
+    return type;
+  };
+
   if (loading) {
     return (
       <div className="page-container">
@@ -634,7 +641,7 @@ const Upi = () => {
               transactions.map((tx) => (
                 <div key={tx._id} className="history-row animate-fade-in">
                   <div className="history-row-left">
-                    <div className={`type-badge badge-${tx.type}`}>{tx.type}</div>
+                    <div className={`type-badge badge-${tx.type?.toLowerCase()}`}>{getTransactionTypeLabel(tx.type)}</div>
                     <div className="history-info">
                       <p className="history-desc">{tx.description}</p>
                       <span className="history-time">{new Date(tx.createdAt).toLocaleString()}</span>
@@ -813,7 +820,7 @@ const Upi = () => {
                         background: req.type === 'deposit' ? 'rgba(16, 185, 129, 0.15)' : 'rgba(244, 63, 94, 0.15)',
                         color: req.type === 'deposit' ? 'var(--color-emerald)' : 'var(--color-rose)'
                       }}>
-                        {req.type}
+                        {getTransactionTypeLabel(req.type)}
                       </span>
                       <strong style={{ color: '#ffffff', fontSize: '16px' }}>₹{req.amount}</strong>
                     </div>
