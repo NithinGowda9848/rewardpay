@@ -72,9 +72,15 @@ const Upi = () => {
 
   const fetchTransactions = useCallback(async () => {
     try {
-      const res = await API.get('/wallet/transactions');
-      if (res.data.success) {
-        setTransactions(res.data.data);
+      const [depRes, wdrRes] = await Promise.all([
+        API.get('/wallet/deposits'),
+        API.get('/wallet/withdrawals')
+      ]);
+      if (depRes.data.success && wdrRes.data.success) {
+        const combined = [...depRes.data.data, ...wdrRes.data.data].sort(
+          (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+        );
+        setTransactions(combined);
       }
       fetchPendingRequests();
       refreshUser();
